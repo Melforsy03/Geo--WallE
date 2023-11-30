@@ -7,7 +7,7 @@ namespace Usuario
     {
         public static void Main (string [] args)
         {
-         string  a = "_ , a = { 90 , 40 , 60 } ; t, _ = {1 ,2 ,3}; sec = intersect(c1 , c2) ; a , rest = {6 , 7 , 8} ; a , b ,_ = { 4 ,5 , 90 } ; a , b , rest = intersect (c1 , c2) ;";
+         string  a = "draw (p1 , p2) ;";
 
          List<token> m = Tokenizar.TokenizeString(a);
 

@@ -309,10 +309,13 @@ namespace TokensGeo
  {
     public List <TokenSecuencia> secuencias {get ; set;} 
     public  List <string> FuncionesEjecutar {get ; set ;}
-    public TokenSecuencia(string Value , TokenTypes type) : base (Value , type )
+
+    public token Padre {get ; set ;}
+    public TokenSecuencia(string Value , TokenTypes type , token Padre) : base (Value , type )
     {
         secuencias = new List<TokenSecuencia>();
         FuncionesEjecutar = new List<string>();
+        this.Padre = Padre;
          
     }
       public IEnumerable<token> Underscore (IEnumerable <token> a )

@@ -69,6 +69,10 @@ namespace ParserGeo
             {
                
                 auxiliar = ParseExpression();
+                if (expression[position].Value == ",")
+                {
+                    position++;
+                }
 
                 if(auxiliar != null)
                 {
@@ -287,19 +291,7 @@ namespace ParserGeo
          {
              node = Figura(c);
          }
-        else if((expression[position].Type == TokenTypes.Identifier && expression[position + 1].Value == ",") || (expression[position + 1].Value == "=" && expression[position + 2].Value == "{"))
-        {
-            node = LineSecuence(expression[position].Value);
-        }
-        else if (expression[position] is Identificador && expression [position + 1].Value == "=" && TipoSecuencia(expression[position + 2].Value))
-        {
-            node = LineSecuence (expression[position].Value);
-        }
-        else if (position + 2 < expression.Count - 1 && expression[position] is Identificador && variablesLocales.Any (p => p.Value == expression[position + 2].Value))
-        {
-            node = LineSecuence(expression[position].Value);
-        }
-        else if (expression[position].Value == "_" || expression[position].Value == "rest")
+        else if(LineSecuenceTipo())
         {
             node = LineSecuence(expression[position].Value);
         }
@@ -342,11 +334,15 @@ namespace ParserGeo
             position++;
             node = ParserIFelse();
         }
-      
         else if (c == "let")
         {
             position++;
             node = Letin();
+        }
+        else if( c == "draw")
+        {
+            position++;
+            node = DrawFunction();
         }
      }
      return node ;
@@ -541,22 +537,22 @@ public  int FindFun(token a , List<token> variables )
     {
         return TipoSecuencia == "intersect"|| TipoSecuencia == "randoms" || TipoSecuencia == "samples" || TipoSecuencia == "points";
     }
-public  TokenSecuencia LineSecuence(string NombreSecuencia)
+public  Geometrico LineSecuence(string NombreSecuencia)
 {
-    TokenSecuencia secuencia = new TokenSecuencia("" , TokenTypes.secuencia);
+    Geometrico secuencia = new Geometrico("" , TokenTypes.secuencia , this );
 
     for (int i = position; i < expression.Count; i++)
     {
         if (expression[i] is Identificador || expression[i].Value == "rest" || expression[i].Value == "_")
         {
-            secuencia.secuencias.Add(new TokenSecuencia(expression[i].Value , TokenTypes.secuencia));
+            secuencia.variablesLocales.Add(new TokenSecuencia(expression[i].Value , TokenTypes.secuencia , this));
             i ++;
             if (expression[i].Value == ",")continue;
         }
         // si encuentro una secuencia seguido de una asignacion y un tipo de secuencia 
         if (TipoSecuencia(expression[i].Value))
         {
-           TokenSecuencia secuenciaHijo = new TokenSecuencia(expression[i].Value ,TokenTypes.secuencia);
+           Geometrico secuenciaHijo = new Geometrico(expression[i].Value ,TokenTypes.secuencia , this);
           
            if (expression[i].Value != "intersect")
            {
@@ -575,14 +571,19 @@ public  TokenSecuencia LineSecuence(string NombreSecuencia)
                     else if(expression[k].Value == ")")
                     {
                         i = k + 1;
-                        if (secuencia.secuencias.Count == 1)
+                        if (secuencia.variablesLocales.Count == 1 || secuencia.variablesLocales.Count == 0)
                         {
                             secuenciaHijo.Value = NombreSecuencia;
                             secuenciaHijo.tokens.Add(intersect);
-                            if (expression[i].Value == ";")
+                            if (expression[i].Value == ";" && secuencia.variablesLocales.Count == 1 )
                             {
                                 position = i + 1;
-                                return secuenciaHijo;
+                                return  secuenciaHijo;
+                            }
+                            else if (secuencia.variablesLocales.Count == 0)
+                            {
+                                position = i ;
+                                return intersect;
                             }
                         }
                         else
@@ -623,17 +624,48 @@ public  TokenSecuencia LineSecuence(string NombreSecuencia)
         }
        if (expression[i].Value == ";" )
         {
-          if (secuencia.secuencias.Count == 1)secuencia.Value = NombreSecuencia;
+          if (secuencia.variablesLocales.Count == 1)secuencia.Value = NombreSecuencia;
           position = i + 1 ;
           return secuencia;
         }
+        position = i ;
     }
     return secuencia;
   }
+  public bool LineSecuenceTipo ()
+  {
+    return ((expression[position].Type == TokenTypes.Identifier && expression[position + 1].Value == ",") || (expression[position + 1].Value == "=" && expression[position + 2].Value == "{")) || (expression[position] is Identificador && expression [position + 1].Value == "=" && TipoSecuencia(expression[position + 2].Value)) || (position + 2 < expression.Count - 1 && expression[position] is Identificador && variablesLocales.Any (p => p.Value == expression[position + 2].Value)) || (expression[position].Value == "_" || expression[position].Value == "rest") || TipoSecuencia(expression[position].Value) ;
+    
+
+  }
   public Geometrico DrawFunction()
   {
-    Geometrico drawFuncion = new Geometrico("draw " , TokenTypes.Funcion, this)
-    
+    Geometrico drawFuncion = new Geometrico("draw" , TokenTypes.Funcion, this);
+    drawFuncion.variablesGlobales.AddRange(this.variablesLocales);
+    drawFuncion.variablesLocales.AddRange(this.variablesLocales);
+    drawFuncion.position = position;
+    drawFuncion.expression = expression;
+    while (expression[drawFuncion.position].Value != ";")
+    {
+        drawFuncion.tokens.Add(drawFuncion.ParseExpression());
+        if(expression[drawFuncion.position].Value == ",")
+        {
+            drawFuncion.position++;
+        }
+        else if (expression[drawFuncion.position].Value == ")")
+        {
+             while(expression[position].Value != ")" )
+        {
+            drawFuncion.position++;
+            if (expression[drawFuncion.position].Value == ";")
+            {
+                break; 
+            }
+        }
+        }
+        position = drawFuncion.position; 
+    } 
+    return drawFuncion;
   }
 }
 }
