@@ -1,364 +1,423 @@
+using Lexer;
 using ParserGeo;
 namespace TokensGeo
 {
-       public enum TokenTypes
-       {
-          Keyword , Identifier ,Number, Operator, Punctuation ,Point ,Condicional , Funcion , boolean, letIn , Comando , Line , Segment , Ray , Circle , point_sequence , line_sequence , Underfine , secuencia
-       } 
-       public interface Evaluacion
-       {
-        public  string Evaluar ();
-       }
-       public class token : Evaluacion 
-       {
-          public string Value { get ; set;}
-
-          public TokenTypes Type {get ; set ;}
-
-          public List <token> tokens {get ; set ;}
-
-          public token (string Value , TokenTypes Type)
-          {
-            this.Value = Value ;
-            this.Type = Type ;
-            tokens = new List<token>();
-          }
-
-         public string Evaluar ()
-         {
-            return Value;
-         }
-
-       }
-       public class Identificador : token
-       {
-        public Identificador (string Value , TokenTypes Type ):base(Value , Type) {}
-       }
-       public class  tokenBul : token
-     {
-      public tokenBul(string Value , TokenTypes type) : base(Value , type){}
-
-       public int Evaluar()
-     {
-        int numero = 0;
-    /*   if (Value == "&&")
-     {
-      
-        numero = ((tokenBul)tokens[0]).Evaluar() && ((tokenBul)tokens[1]).Evaluar() ? 1 : 0 ;
-    }
-    else if (Value == "||")
-    {
-       
-       numero = (((tokenBul)tokens[0]).Evaluar() || ((tokenBul)tokens[1]).Evaluar()) ? 1 :0;
-        
-    }*/
-     if (Value == "!=")
-    {
-
-         numero = double. Parse(tokens[0].Evaluar()) != double.Parse(tokens[1].Evaluar())? 1 : 0;
-       
-    }
-    else if (Value == ">")
-    {
-         numero = double. Parse(tokens[0].Evaluar()) > double.Parse(tokens[1].Evaluar())? 1 : 0;  
-    }
-    else if (Value == "<" )
-    {
-         numero = double. Parse(tokens[0].Evaluar()) < double.Parse(tokens[1].Evaluar())? 1 : 0 ;
-    }
-    else if (Value == "==" )
-    {
-     
-       numero = double. Parse (tokens[0].Evaluar()) == double.Parse(tokens[1].Evaluar()) ? 1 : 0;
-     
-    }
-    else if (Value == ">=" )
-    {
-     
-      numero = double. Parse (tokens[0].Evaluar()) >= double.Parse(tokens[1].Evaluar()) ? 1 : 0;
-      
-    }
-    else if (Value == "<=" )
-    {
-        numero = double. Parse (tokens[0].Evaluar()) <= double.Parse(tokens[1].Evaluar())? 1 : 0;  
-     }
-     return numero ;
-  
-     }
+  public enum TokenTypes
+  {
+    Keyword, Identifier, Number, Operator, Punctuation, Point, Condicional,
+    Funcion, boolean, letIn, Comando, Line, Segment, Ray, Circle, point_sequence, line_sequence, Underfine, secuencia
   }
-       public class TokenNumero :  token
-       {
-         public TokenNumero(string Value , TokenTypes Type) : base (Value , Type){}
-       }
-       public class Function : token 
-       {
-        public List<token> globales {get ; set ;}
-         public Function (string Value , TokenTypes Type) : base ( Value , Type) 
-         {
-             globales = new List<token>();
-         }
-       }
-       public class FuncionPointsDos : Function
-       {
-          public FuncionPointsDos (string Value , TokenTypes Type , token point1 , token point2) : base (Value , Type)
-          {
+  public interface Evaluacion
+  {
+    public string Evaluar();
+    public bool CheckSemantic(List<Errors> errores);
+  }
+  public class token : Evaluacion
+  {
+    public string Value { get; set; }
 
-          }
-       }
-       public class OperatorNode : token
-       {
-          public OperatorNode(string Value  , TokenTypes Type ) : base ( Value , Type){}
-         
-         public double Evaluar()
+    public TokenTypes Type { get; set; }
+    public GeoType GeoType { get; set; }
+
+    public List<token> tokens { get; set; }
+
+    public token(string Value, TokenTypes Type)
     {
-        // Evaluar la operación según el operador        
-            
-       if (Value == "+")
-       {
-        
-            try
-            {
-                return double.Parse(tokens[0].Evaluar()) + double.Parse(tokens[1].Evaluar()) ;  
-            }
-            catch (System.Exception)
-            {
-                
-                Console.WriteLine(" error en ejecucuion ,el operador" +  Value + " no puede operar con estos elementos");
-            }
+      this.Value = Value;
+      this.Type = Type;
+      tokens = new List<token>();
+    }
+    public string Evaluar()
+    {
+      return Value;
+    }
 
-       }
-       else if (Value == "-")
-       {
-         try
-            {
-                return double.Parse(tokens[0].Evaluar()) - double.Parse(tokens[1].Evaluar()) ;  
-            }
-            catch (System.Exception)
-            {
-                
-                Console.WriteLine(" error en ejecucuion ,el operador" +  Value + " no puede operar con estos elementos");
-            }           
-            
-       }
-       else if (Value == "*")
-       {
-            try
-            {
-                return double.Parse(tokens[0].Evaluar()) * double.Parse(tokens[1].Evaluar()) ;  
-            }
-            catch (System.Exception)
-            {
-                
-                Console.WriteLine(" error en ejecucuion ,el operador " + Value + " no puede operar con estos elementos");
-            }
-       }
-       else if (Value == "/")
-       {
-            try
-            {
-                return double.Parse(tokens[0].Evaluar()) / double.Parse(tokens[1].Evaluar()) ;  
-            }
-            catch (System.Exception)
-            {
-                Console.WriteLine(" error en ejecucuion ,el operador " + Value + " no puede operar con estos elementos");
-            }
-        
-       }
-        else if (Value == "%")
-       {
-            try
-            {
-                return double.Parse(tokens[0].Evaluar()) % double.Parse(tokens[1].Evaluar()) ;  
-            }
-            catch (System.Exception)
-            {
-                Console.WriteLine(" error en ejecucuion ,el operador " + Value + " no puede operar con estos elementos");
-            }
-        
-       }
-       else if (Value == "^")
-       {
-      try
+    public virtual bool CheckSemantic(List<Errors> errores)
+    {
+      bool var = false;
+      for (int i = 0; i < tokens.Count(); i++)
       {
-        return Math.Pow(double.Parse(tokens[0].Evaluar()) , double.Parse(tokens[1].Evaluar())) ; 
+        var = var && tokens[i].CheckSemantic(errores);
       }
-      catch (System.Exception)
+      return var;
+    }
+  }
+  public class Identificador : token
+  {
+    public GeoType geoType { get; set; }
+    public Identificador(string Value, TokenTypes Type) : base(Value, Type) { }
+
+    public override bool CheckSemantic(List<Errors> errores)
+    {
+      geoType = GeoType.IdentificadorType;
+      return true;
+    }
+  }
+  public class tokenBul : token
+  {
+    public tokenBul(string Value, TokenTypes Type) : base(Value, Type) { }
+
+    public GeoType GeoType { get; set; }
+    public override bool CheckSemantic(List<Errors> errores)
+    {
+      bool parte_izquierda = tokens[0]!.CheckSemantic(errores);
+      bool parte_derecha = tokens[1]!.CheckSemantic(errores);
+      if (tokens[0]!.GeoType != GeoType.NumberType || tokens[1]!.GeoType != GeoType.NumberType)
       {
-        
-         Console.WriteLine("error en ejecucuion , el operador " + Value + "no opera con esos elementos");
-       }
-             
-       }
-       else if (Value == "Sqrt")
-       {
-        try
-        {
-        return Math.Sqrt(double.Parse(tokens[0].Evaluar()));
-        }
-        catch (System.Exception)
-        {
-            
-            throw;
-        }
-       }
-     throw new ArgumentException (" error en ejecucuion ,no se pudo ejecutar esta operacion");
-}
-       }
-       //figuras de dos puntos como , el segmento , el rayo , medida  entre dos puntos 
-    public class FigDeDosPunto : token 
-       {
-          public  token a {get ;set;}
-          public token b {get ; set ;}
-          public FigDeDosPunto (string Value , TokenTypes Type , token a , token b) : base (Value , Type)
-          {
-              this.Value = Value ;
-              this.Type = Type ;
-              this.a = a ;
-              this.b = b ;
-          }
-       }
-    public class LetIn : Geometrico
+        errores.Add(new Errors(ErrorCode.Semantic, "no puede utilizar el operador" + Value + " con estos dos elementos"));
+        GeoType = GeoType.ErrorType;
+        return false;
+      }
+
+      GeoType = GeoType.NumberType;
+      return parte_izquierda && parte_derecha;
+    }
+
+    public int Evaluar()
+    {
+      int numero = 0;
+
+      if (Value == "!=")
       {
-       public LetIn (string Value , TokenTypes type , Geometrico Padre) : base(Value , type , Padre)
-       {
-        this.Value = "let";
-        this.Type = TokenTypes.letIn;
-       } 
-   }
-   public class IfElseNode : Geometrico
-   {
-      public IfElseNode(string Value ,  TokenTypes Type , Geometrico Padre) : base(Value , Type , Padre){}
-      public string Evaluar()
-     {
-        if (((tokenBul)tokens[0]).Evaluar() == 1)
+        numero = double.Parse(tokens[0].Evaluar()) != double.Parse(tokens[1].Evaluar()) ? 1 : 0;
+      }
+      else if (Value == ">")
+      {
+        numero = double.Parse(tokens[0].Evaluar()) > double.Parse(tokens[1].Evaluar()) ? 1 : 0;
+      }
+      else if (Value == "<")
+      {
+        numero = double.Parse(tokens[0].Evaluar()) < double.Parse(tokens[1].Evaluar()) ? 1 : 0;
+      }
+      else if (Value == "==")
+      {
+        numero = double.Parse(tokens[0].Evaluar()) == double.Parse(tokens[1].Evaluar()) ? 1 : 0;
+      }
+      else if (Value == ">=")
+      {
+        numero = double.Parse(tokens[0].Evaluar()) >= double.Parse(tokens[1].Evaluar()) ? 1 : 0;
+      }
+      else if (Value == "<=")
+      {
+        numero = double.Parse(tokens[0].Evaluar()) <= double.Parse(tokens[1].Evaluar()) ? 1 : 0;
+      }
+
+      return numero;
+    }
+  }
+
+  public class TokenNumero : token
+  {
+    public GeoType geoType { get; set; }
+    public TokenNumero(string Value, TokenTypes Type) : base(Value, Type) { }
+    public override bool CheckSemantic(List<Errors> errores)
+    {
+      geoType = GeoType.NumberType;
+      return true;
+    }
+  }
+  public class Function : token
+  {
+    public List<token> globales { get; set; }
+    public Function(string Value, TokenTypes Type) : base(Value, Type)
+    {
+      globales = new List<token>();
+    }
+  }
+  public class FuncionPointsDos : Function
+  {
+    public Point p1;
+    public Point p2;
+    private string name;
+    private Color color;
+
+    public FuncionPointsDos(string Value, TokenTypes Type, token point1, token point2, string name, Color color) : base(Value, Type)
+    {
+      p1!.x = int.Parse(point1.tokens[0].Value);
+      p1.y = int.Parse(point1.tokens[1].Value);
+
+      p2!.x = int.Parse(point2.tokens[0].Value);
+      p2.y = int.Parse(point2.tokens[1].Value);
+
+      this.name = name;
+      this.color = color;
+    }
+    public FuncionPointsDos(string Value, TokenTypes Type, string name, Color color) : base(Value, Type)
+    {
+      Random random = new Random(1000);
+      p1!.x = random.Next(1,100);
+      p1.y = random.Next(1,100); 
+      p2!.x = random.Next(1,100); 
+      p2.y = random.Next(1,100); 
+      
+      this.name = name;
+      this.color = color;
+    }
+  }
+  public class OperatorNode : token
+  {
+    public OperatorNode(string Value, TokenTypes Type) : base(Value, Type) { }
+
+    public GeoType GeoType { get; set; }
+    public override bool CheckSemantic(List<Errors> errores)
+    {
+      bool parte_izquierda = tokens[0]!.CheckSemantic(errores);
+      bool parte_derecha = tokens[1]!.CheckSemantic(errores);
+      if (tokens[0]!.GeoType != GeoType.NumberType || tokens[1]!.GeoType != GeoType.NumberType)
+      {
+        errores.Add(new Errors(ErrorCode.Semantic, "no puede utilizar el operador" + Value + " con estos dos elementos"));
+        GeoType = GeoType.ErrorType;
+        return false;
+      }
+
+      GeoType = GeoType.NumberType;
+      return parte_izquierda && parte_derecha;
+    }
+
+    public double Evaluar()
+    {
+      // Evaluar la operación según el operador        
+      double numero = 0;
+
+      if (Value == "+")
+      {
+        numero = double.Parse(tokens[0].Evaluar()) + double.Parse(tokens[1].Evaluar());
+      }
+      else if (Value == "-")
+      {
+        numero = double.Parse(tokens[0].Evaluar()) - double.Parse(tokens[1].Evaluar());
+      }
+      else if (Value == "*")
+      {
+        numero = double.Parse(tokens[0].Evaluar()) * double.Parse(tokens[1].Evaluar());
+      }
+      else if (Value == "/")
+      {
+        numero = double.Parse(tokens[0].Evaluar()) / double.Parse(tokens[1].Evaluar());
+      }
+      else if (Value == "%")
+      {
+        numero = double.Parse(tokens[0].Evaluar()) % double.Parse(tokens[1].Evaluar());
+      }
+      else if (Value == "^")
+      {
+        numero = int.Parse(tokens[0].Evaluar()) ^ int.Parse(tokens[1].Evaluar());
+      }
+
+      return numero;
+    }
+  }
+  //figuras de dos puntos como , el segmento , el rayo , medida  entre dos puntos 
+  public class FigDeDosPunto : token
+  {
+    public token a { get; set; }
+    public token b { get; set; }
+    public FigDeDosPunto(string Value, TokenTypes Type, token a, token b) : base(Value, Type)
+    {
+      this.Value = Value;
+      this.Type = Type;
+      this.a = a;
+      this.b = b;
+    }
+  }
+  public class LetIn : Geometrico
+  {
+    public LetIn(string Value, TokenTypes type, Geometrico Padre) : base(Value, type, Padre)
+    {
+      this.Value = "let";
+      this.Type = TokenTypes.letIn;
+    }
+    public GeoType geoType { get; set; }
+    public override bool CheckSemantic(List<Errors> errores)
+    {
+      bool expresion_let = false;
+      bool expresion_in = false;
+      for (int i = 0; i < this.variablesLocales.Count; i++)
+      {
+        expresion_let = expresion_let && variablesLocales[i].CheckSemantic(errores);
+      }
+      for (int i = 0; i < this.expression.Count; i++)
+      {
+        expresion_in = expresion_in && expression[i].CheckSemantic(errores);
+      }
+
+      if (!(expresion_let && expresion_in))
+      {
+        geoType = GeoType.ErrorType;
+        return false;
+      }
+
+      return true;
+    }
+  }
+  public class IfElseNode : Geometrico
+  {
+    public IfElseNode(string Value, TokenTypes Type, Geometrico Padre) : base(Value, Type, Padre) { }
+    public GeoType GeoType { get; set; }
+    public override bool CheckSemantic(List<Errors> errores)
+    {
+      bool parte_if = tokens[1]!.CheckSemantic(errores);
+      bool parte_else = tokens[2]!.CheckSemantic(errores);
+
+      if (tokens[1]!.GeoType != GeoType.NumberType)
+      {
+        errores.Add(new Errors(ErrorCode.Semantic, "hay error con la expresion if-else"));
+        GeoType = GeoType.ErrorType;
+        return false;
+      }
+
+      GeoType = GeoType.NumberType;
+      return parte_if && parte_else;
+    }
+    public string Evaluar()
+    {
+      if (((tokenBul)tokens[0]).Evaluar() == 1)
+      {
+        return tokens[1].Evaluar().ToString();
+      }
+      else
+      {
+        return tokens[2].Evaluar().ToString();
+      }
+    }
+  }
+  public class FunctionNode : token
+  {
+    public FunctionNode(string FunctionName, TokenTypes type) : base(FunctionName, type) { }
+    public GeoType GeoType { get; set; }
+    public override bool CheckSemantic(List<Errors> errores)
+    {
+      bool argumento = tokens[0]!.CheckSemantic(errores);
+
+      if (tokens[0]!.GeoType == GeoType.NumberType)
+      {
+        errores.Add(new Errors(ErrorCode.Semantic, "Le debe pasar a la funcion un nmero"));
+        GeoType = GeoType.ErrorType;
+        return false;
+      }
+
+      GeoType = GeoType.NumberType;
+      return argumento;
+    }
+    public double Evaluar()
+    {
+      double numero = 0;
+      // Evaluar la función según el nombre
+      if (Value == "sin")
+      {
+        if (tokens[0].Type == TokenTypes.Operator)
         {
-          return tokens[1].Evaluar().ToString();
+          numero = Math.Sin(((OperatorNode)tokens[0]).Evaluar());
         }
         else
         {
-            try
-            {
-                   return tokens[2].Evaluar().ToString();
-            }
-            catch (System.Exception)
-            {
-                Console.WriteLine("error en ejcucion en la funcion if - else ");
-                throw;
-            }
-          
-
+          numero = Math.Sin(Double.Parse(tokens[0].Evaluar()));
         }
-
+      }
+      else if (Value == "cos")
+      {
+        if (tokens[0].Type == TokenTypes.Operator)
+        {
+          numero = Math.Cos(((OperatorNode)tokens[0]).Evaluar());
+        }
+        else
+        {
+          numero = Math.Cos(Double.Parse(tokens[0].Evaluar()));
+        }
+      }
+      else if (Value == "tan")
+      {
+        if (tokens[0].Type == TokenTypes.Operator)
+        {
+          numero = Math.Tan(((OperatorNode)tokens[0]).Evaluar());
+        }
+        else
+        {
+          numero = Math.Tan(Double.Parse(tokens[0].Evaluar()));
+        }
+      }
+      else if (Value == "sqrt")
+      {
+        if (tokens[0].Type == TokenTypes.Operator)
+        {
+          numero = Math.Sqrt(((OperatorNode)tokens[0]).Evaluar());
+        }
+        else
+        {
+          numero = Math.Sqrt(Double.Parse(tokens[0].Evaluar()));
+        }
+      }
+      return numero;
     }
   }
-   public class FunctionNode : token
-{
-    public FunctionNode (string FunctionName , TokenTypes type ):base (FunctionName , type){}
-   
-    public double Evaluar()
-    {
-        // Evaluar la función según el nombre
-       if (Value == "sin")
-       {
-                if (tokens[0].Type == TokenTypes.Operator)
-                {
-                return Math.Sin(((OperatorNode)tokens[0]).Evaluar());
-                }
-                else
-                {
-                    return Math.Sin(Double.Parse(tokens[0].Evaluar()));
-                }
-       }
-       else if (Value == "cos")
-       {
-         if (tokens[0].Type == TokenTypes.Operator)
-                {
-                return Math.Cos(((OperatorNode)tokens[0]).Evaluar());
-                }
-                else
-                {
-                    return Math.Cos(Double.Parse(tokens[0].Evaluar()));
-                }
-       }
-         else if (Value == "tan")
-       {
-         if (tokens[0].Type == TokenTypes.Operator)
-                {
-                return Math.Tan(((OperatorNode)tokens[0]).Evaluar());
-                }
-                else
-                {
-                    return Math.Tan(Double.Parse(tokens[0].Evaluar()));
-                }
-       }
-        else if (Value == "sqrt")
-       {
-         if (tokens[0].Type == TokenTypes.Operator)
-                {
-                return Math.Sqrt(((OperatorNode)tokens[0]).Evaluar());
-                }
-                else
-                {
-                    return Math.Sqrt(Double.Parse(tokens[0].Evaluar()));
-                }
-       }   
-                throw new InvalidOperationException("Función no válida");
-    }
-}
- public class TokenSecuencia : token 
- {
-    public List <TokenSecuencia> secuencias {get ; set;} 
-    public  List <string> FuncionesEjecutar {get ; set ;}
+  public class TokenSecuencia : token
+  {
+    public List<TokenSecuencia> secuencias { get; set; }
+    public List<string> FuncionesEjecutar { get; set; }
+    public token Padre { get; set; }
+    public GeoType geoType { get; set; }
 
-    public token Padre {get ; set ;}
-    public TokenSecuencia(string Value , TokenTypes type , token Padre) : base (Value , type )
+    public TokenSecuencia(string Value, TokenTypes type, token Padre) : base(Value, type)
     {
-        secuencias = new List<TokenSecuencia>();
-        FuncionesEjecutar = new List<string>();
-        this.Padre = Padre;
-         
+      secuencias = new List<TokenSecuencia>();
+      FuncionesEjecutar = new List<string>();
+      this.Padre = Padre;
     }
-      public IEnumerable<token> Underscore (IEnumerable <token> a )
+    public override bool CheckSemantic(List<Errors> errores)
+    {
+      bool expresion = false;
+
+      for (int i = 0; i < this.tokens.Count; i++)
       {
-            return a.Skip(1);
+        expresion = expresion && tokens[i].CheckSemantic(errores);
       }
-        //devuelve el primer termino de la secuencia
-        public token Rest (IEnumerable<token> a ) 
-        {
-              IEnumerator<token> c = a.GetEnumerator() ;
-              c.MoveNext();
-              return c.Current;
-        }
-        public IEnumerable<token> Intersect (token a , token b)
-        {
-            return a.tokens.Intersect(b.tokens);
-        }
-        public IEnumerable<token> samples ()
-        {
-        token [] a = new token[20];
 
-        Random ran = new Random();
+      if (!expresion)
+      {
+        geoType = GeoType.ErrorType;
+        return false;
+      }
 
-        for (int i = 0; i < a.Length; i++)
-        {
-            a[i] = new token("p" + i  , TokenTypes.Point);
-        }
-        for (int i = 0; i < a.Length; i++)
-        {
-            yield return a[ran.Next(a.Length)];
-        }
-        }
-       //devuelve una secuencia de valores positivos 
-       public  IEnumerable <int> randoms ()
-       {
-         Random ran = new Random ();
-          for (int i = 0; i < 21 ; i++)
-          {
-            yield return ran.Next(1 ,  101);
-          }
-       }
-     
+      return true;
+    }
+    public IEnumerable<token> Underscore(IEnumerable<token> a)
+    {
+      return a.Skip(1);
+    }
+    //devuelve el primer termino de la secuencia
+    public token Rest(IEnumerable<token> a)
+    {
+      IEnumerator<token> c = a.GetEnumerator();
+      c.MoveNext();
+      return c.Current;
+    }
+    public IEnumerable<token> Intersect(token a, token b)
+    {
+      return a.tokens.Intersect(b.tokens);
+    }
+    public IEnumerable<token> samples()
+    {
+      token[] a = new token[20];
 
- }
+      Random ran = new Random();
 
+      for (int i = 0; i < a.Length; i++)
+      {
+        a[i] = new token("p" + i, TokenTypes.Point);
+      }
+      for (int i = 0; i < a.Length; i++)
+      {
+        yield return a[ran.Next(a.Length)];
+      }
+    }
+    //devuelve una secuencia de valores positivos 
+    public IEnumerable<int> randoms()
+    {
+      Random ran = new Random();
+      for (int i = 0; i < 21; i++)
+      {
+        yield return ran.Next(1, 101);
+      }
+    }
+  }
 }
