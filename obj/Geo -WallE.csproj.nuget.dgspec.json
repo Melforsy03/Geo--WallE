@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\fosythe´s family\\Desktop\\Geo -WallE\\Geo -WallE.csproj": {}
+    "C:\\Users\\Livi3\\Desktop\\GWall-e\\Geo--WallE\\Geo -WallE.csproj": {}
   },
   "projects": {
-    "C:\\Users\\fosythe´s family\\Desktop\\Geo -WallE\\Geo -WallE.csproj": {
+    "C:\\Users\\Livi3\\Desktop\\GWall-e\\Geo--WallE\\Geo -WallE.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\fosythe´s family\\Desktop\\Geo -WallE\\Geo -WallE.csproj",
+        "projectUniqueName": "C:\\Users\\Livi3\\Desktop\\GWall-e\\Geo--WallE\\Geo -WallE.csproj",
         "projectName": "Geo -WallE",
-        "projectPath": "C:\\Users\\fosythe´s family\\Desktop\\Geo -WallE\\Geo -WallE.csproj",
-        "packagesPath": "C:\\Users\\fosythe´s family\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\fosythe´s family\\Desktop\\Geo -WallE\\obj\\",
+        "projectPath": "C:\\Users\\Livi3\\Desktop\\GWall-e\\Geo--WallE\\Geo -WallE.csproj",
+        "packagesPath": "C:\\Users\\Livi3\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Livi3\\Desktop\\GWall-e\\Geo--WallE\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\fosythe´s family\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Livi3\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -43,16 +49,35 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[6.0.20, 6.0.20]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[6.0.20, 6.0.20]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[6.0.20, 6.0.20]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[6.0.20, 6.0.20]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
         }
       }
     }

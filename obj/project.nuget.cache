@@ -1,8 +1,33 @@
 {
   "version": 2,
-  "dgSpecHash": "Mkh5y72dmp1VuL5pzTjaSK/L24D8Xk2EUDQH4gV5/AewRDLs6RHGfZdlrlJD3A5z4SlYDiyrWuKRb0cBd3g9Ag==",
-  "success": true,
-  "projectFilePath": "C:\\Users\\fosythe´s family\\Desktop\\Geo -WallE\\Geo -WallE.csproj",
+  "dgSpecHash": "GnwcSzf28CLV63FVl9HOqrfhbcZuS34jYh4hFzHVq7ze+42S5NZor1AeXhPD9BoH+pAYySc7c4Mpeb5B4LdXhA==",
+  "success": false,
+  "projectFilePath": "C:\\Users\\Livi3\\Desktop\\GWall-e\\Geo--WallE\\Geo -WallE.csproj",
   "expectedPackageFiles": [],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "Unable to load the service index for source https://api.nuget.org/v3/index.json.",
+      "libraryId": "Microsoft.NETCore.App.Ref"
+    },
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "Unable to load the service index for source https://api.nuget.org/v3/index.json.",
+      "libraryId": "Microsoft.WindowsDesktop.App.Ref"
+    },
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "Unable to load the service index for source https://api.nuget.org/v3/index.json.",
+      "libraryId": "Microsoft.AspNetCore.App.Ref"
+    },
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "Unable to load the service index for source https://api.nuget.org/v3/index.json.",
+      "libraryId": "Microsoft.NETCore.App.Host.win-x64"
+    }
+  ]
 }
