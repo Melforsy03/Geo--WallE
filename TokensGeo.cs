@@ -3,13 +3,13 @@ namespace TokensGeo
 {
        public enum TokenTypes
        {
-          Keyword , Identifier ,Number, Operator, Punctuation ,Point ,Condicional , Funcion , boolean, letIn , Comando , Line , Segment , Ray , Circle , point_sequence , line_sequence , Underfine , secuencia
+          Keyword , Identifier ,Number, Operator, Punctuation ,Point ,Condicional , Funcion , boolean, letIn , Comando , Line , Segment , Ray , Circle , point_sequence , line_sequence , Underfine , secuencia , Arc , Color
        } 
        public interface Evaluacion
        {
         public  string Evaluar ();
        }
-       public class token : Evaluacion 
+       public class token : Evaluacion , ICloneable 
        {
           public string Value { get ; set;}
 
@@ -23,8 +23,11 @@ namespace TokensGeo
             this.Type = Type ;
             tokens = new List<token>();
           }
-
-         public string Evaluar ()
+    public object Clone ()
+    {
+      return this.MemberwiseClone();
+    }
+       public string Evaluar ()
          {
             return Value;
          }
@@ -41,21 +44,11 @@ namespace TokensGeo
        public int Evaluar()
      {
         int numero = 0;
-    /*   if (Value == "&&")
-     {
-      
-        numero = ((tokenBul)tokens[0]).Evaluar() && ((tokenBul)tokens[1]).Evaluar() ? 1 : 0 ;
-    }
-    else if (Value == "||")
-    {
-       
-       numero = (((tokenBul)tokens[0]).Evaluar() || ((tokenBul)tokens[1]).Evaluar()) ? 1 :0;
-        
-    }*/
+
      if (Value == "!=")
     {
 
-         numero = double. Parse(tokens[0].Evaluar()) != double.Parse(tokens[1].Evaluar())? 1 : 0;
+       numero = double. Parse(tokens[0].Evaluar()) != double.Parse(tokens[1].Evaluar())? 1 : 0;
        
     }
     else if (Value == ">")
@@ -98,13 +91,7 @@ namespace TokensGeo
              globales = new List<token>();
          }
        }
-       public class FuncionPointsDos : Function
-       {
-          public FuncionPointsDos (string Value , TokenTypes Type , token point1 , token point2) : base (Value , Type)
-          {
-
-          }
-       }
+    
        public class OperatorNode : token
        {
           public OperatorNode(string Value  , TokenTypes Type ) : base ( Value , Type){}
@@ -205,18 +192,30 @@ namespace TokensGeo
 }
        }
        //figuras de dos puntos como , el segmento , el rayo , medida  entre dos puntos 
-    public class FigDeDosPunto : token 
-       {
-          public  token a {get ;set;}
-          public token b {get ; set ;}
-          public FigDeDosPunto (string Value , TokenTypes Type , token a , token b) : base (Value , Type)
+    public class FigDeDosPunto : Geometrico 
+    {
+          public FigDeDosPunto (string Value , TokenTypes Type , Geometrico root) : base (Value , Type , root)
           {
               this.Value = Value ;
               this.Type = Type ;
-              this.a = a ;
-              this.b = b ;
+              this.Root = Root;
           }
-       }
+      }
+      public class Arco : Geometrico 
+      {
+        public Arco (string Value , TokenTypes Type , Geometrico root ) : base (Value , Type , root)
+        {
+          this.Value = Value;
+          this.Type = Type;
+          this.Root = Root;
+        }
+      }
+      public class Circunferencia : Geometrico
+      {
+        public Circunferencia (string Value , TokenTypes Type , Geometrico root ) :base (Value ,Type , root)
+        {
+        }
+      }
     public class LetIn : Geometrico
       {
        public LetIn (string Value , TokenTypes type , Geometrico Padre) : base(Value , type , Padre)
@@ -236,17 +235,7 @@ namespace TokensGeo
         }
         else
         {
-            try
-            {
-                   return tokens[2].Evaluar().ToString();
-            }
-            catch (System.Exception)
-            {
-                Console.WriteLine("error en ejcucion en la funcion if - else ");
-                throw;
-            }
-          
-
+         return tokens[2].Evaluar().ToString();
         }
 
     }
@@ -302,7 +291,7 @@ namespace TokensGeo
                     return Math.Sqrt(Double.Parse(tokens[0].Evaluar()));
                 }
        }   
-                throw new InvalidOperationException("Función no válida");
+       throw new Exception();
     }
 }
  public class TokenSecuencia : token 
@@ -357,8 +346,12 @@ namespace TokensGeo
             yield return ran.Next(1 ,  101);
           }
        }
-     
-
  }
 
+public class Color : token 
+{
+  public Color (string Value , TokenTypes Type) : base (Value , Type ){}
+
 }
+}
+

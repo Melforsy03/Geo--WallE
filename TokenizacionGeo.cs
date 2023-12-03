@@ -175,21 +175,22 @@ namespace Lexer
                                i = j ;
                                break;
                             }
+                        else if (tokens[tokens.Count - 1].Value == "color")
+                       {
+                         tokens[tokens.Count - 1] = new Color(currentToken , TokenTypes.Color);
+                         i = j ;
+                         currentToken = "";
+                         break;
                        }
-                      if (input[j] == ' ')
+                       }
+                      if (input[j] == ' ' || IsPunctuation(input[j].ToString()))
                     {
-                         tokens.Add(new Identificador (currentToken , TokenTypes.Identifier));
-                         currentToken = "";
+                          tokens.Add(new Identificador (currentToken , TokenTypes.Identifier));
+                          currentToken = "";
                           i = j ;
                           break;
                     }
-                    if(IsPunctuation(input[j].ToString()))
-                    {
-                         tokens.Add(new Identificador (currentToken , TokenTypes.Identifier));
-                         currentToken = "";
-                          i = j ;
-                          break;
-                    }
+    
                 }
                 if (input[i] != ' ' && IsPunctuation(input[i].ToString()))
                 {
@@ -212,7 +213,7 @@ namespace Lexer
      }
       public static bool IsComando(string c)
      {
-        return c == "let" || c == "in" || c =="point" || c == "line" || c == "segment" || c == "ray" || c == "circle" || c == "sequence" ;
+        return c == "let" || c == "in" || c =="point" || c == "line" || c == "segment" || c == "ray" || c == "circle" || c == "sequence" || c == "color" ;
      }
       public  static bool Isfunction(string c)
      {
