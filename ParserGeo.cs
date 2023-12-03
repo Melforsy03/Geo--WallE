@@ -36,7 +36,7 @@ namespace ParserGeo
             
             if (Tipos(expression[position].Type))
             {
-                variablesLocales.Add(expression[position]);
+                this.variablesLocales.Add(expression[position]);
                 position++;
                 if (expression[position].Value == ";")
                 {
@@ -63,7 +63,7 @@ namespace ParserGeo
             {
                 position++;
                 auxiliar = DrawFunction();
-                tokens.Add(auxiliar);
+                this.tokens.Add(auxiliar);
             }
             else  
             {
@@ -110,14 +110,7 @@ namespace ParserGeo
                c = expression[position].Value ;
             }
           }
-          if (leftNode != null && leftNode is OperatorNode && c == ")")
-          {
-          if (position + 1 < expression.Count)
-            {
-                 position++;
-               c = expression[position].Value ;
-            }
-          }
+          
             //si encuentra una funcion
              if(Isfunction(c))
             {
@@ -264,7 +257,7 @@ namespace ParserGeo
          else if(expression[position].Type == TokenTypes.Identifier ) 
         {
             position++;
-            return expression[position];
+            return expression[position - 1];
         }
         // si es alguno de los caracteres continua el parseo ;
         else if (c == "(" || c == "{" || c == "="  || c == "=>"  )
@@ -285,23 +278,23 @@ namespace ParserGeo
 } 
     private  token  ParserIFelse()
     {
-      IfElseNode ifi = new IfElseNode("if" , TokenTypes.Condicional ,Root );
+      IfElseNode ifi = new IfElseNode("if" , TokenTypes.Condicional , Root );
       ifi.expression = expression;
       ifi.position = position;
       token a = ifi.ParseExpression();
       ifi.tokens.Add(a);
       ifi.position++;
-      token b = ifi.Expresiones();
-     // ifi.tokens.Add(b);
+      token b = ifi.ParseExpression();
+      ifi.tokens.Add(b);
       if(expression[position].Value == "(")
       {
        position++;
       }
       ifi.position++;
-       token c = ifi.Expresiones();
-    //   ifi.tokens.Add(c);
-       position = ifi.position;
-       return ifi;
+      token c = ifi.ParseExpression();
+      ifi.tokens.Add(c);
+      position = ifi.position;
+    return ifi;
     }
     private token FuncionesGeo(string NombreFuncion)
     {
@@ -309,12 +302,21 @@ namespace ParserGeo
         Funcion.variablesGlobales.AddRange(variablesGlobales);
         Funcion.variablesGlobales.AddRange(variablesLocales);
         Funcion.position = position;
-        while (expression[Funcion.position].Value != ")")
+        Funcion.expression = expression;
+         while (expression[Funcion.position].Value != ")")
         {
-            Funcion.variablesLocales.Add(ParseExpression());
+            Funcion.variablesLocales.Add(Funcion.ParseExpression());
         }
+         Funcion.position ++;
+        if (expression[Funcion.position].Value == ";")
+        {
+            position = Funcion.position;
+            return Funcion ;
+        }
+        position = Funcion.position;
         if(expression[Funcion.position].Value == "=") Funcion.position++;
-        Funcion.tokens.Add(ParseExpression());
+        else if(expression[Funcion.position].Value != "=")return Funcion;
+        Funcion.tokens.Add(Funcion.ParseExpression());
         position = Funcion.position;
         return Funcion ;
     }
@@ -560,8 +562,6 @@ namespace ParserGeo
   public bool LineSecuenceTipo ()
   {
     return ((expression[position].Type == TokenTypes.Identifier && expression[position + 1].Value == ",") || (expression[position + 1].Value == "=" && expression[position + 2].Value == "{")) || (expression[position] is Identificador && expression [position + 1].Value == "=" && TipoSecuencia(expression[position + 2].Value)) || (position + 2 < expression.Count - 1 && expression[position] is Identificador && variablesLocales.Any (p => p.Value == expression[position + 2].Value)) || (expression[position].Value == "_" || expression[position].Value == "rest") || TipoSecuencia(expression[position].Value) ;
-    
-
   }
   public Geometrico DrawFunction()
   {

@@ -7,7 +7,7 @@ namespace Usuario
     {
         public static void Main (string [] args)
         {
-         string  a = "draw (p1 , p2) ;";
+         string  a = "Fib (n) =  if n <= 1 then 1 else Fib (n - 1) + Fib (n - 2) ;";
 
          List<token> m = Tokenizar.TokenizeString(a);
 

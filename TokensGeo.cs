@@ -216,7 +216,7 @@ namespace TokensGeo
         {
         }
       }
-    public class LetIn : Geometrico
+      public class LetIn : Geometrico
       {
        public LetIn (string Value , TokenTypes type , Geometrico Padre) : base(Value , type , Padre)
        {
@@ -224,7 +224,7 @@ namespace TokensGeo
         this.Type = TokenTypes.letIn;
        } 
    }
-   public class IfElseNode : Geometrico
+       public class IfElseNode : Geometrico
    {
       public IfElseNode(string Value ,  TokenTypes Type , Geometrico Padre) : base(Value , Type , Padre){}
       public string Evaluar()
@@ -240,8 +240,8 @@ namespace TokensGeo
 
     }
   }
-   public class FunctionNode : token
-{
+      public class FunctionNode : token
+     {
     public FunctionNode (string FunctionName , TokenTypes type ):base (FunctionName , type){}
    
     public double Evaluar()
@@ -347,7 +347,6 @@ namespace TokensGeo
           }
        }
  }
-
 public class Color : token 
 {
   public Color (string Value , TokenTypes Type) : base (Value , Type ){}
