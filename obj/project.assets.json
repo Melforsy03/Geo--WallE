@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Livi3\\Desktop\\GWall-e\\Geo--WallE\\Geo -WallE.csproj",
+      "projectUniqueName": "C:\\Users\\Livi3\\Desktop\\Geo--WallE\\Geo -WallE.csproj",
       "projectName": "Geo -WallE",
-      "projectPath": "C:\\Users\\Livi3\\Desktop\\GWall-e\\Geo--WallE\\Geo -WallE.csproj",
+      "projectPath": "C:\\Users\\Livi3\\Desktop\\Geo--WallE\\Geo -WallE.csproj",
       "packagesPath": "C:\\Users\\Livi3\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Livi3\\Desktop\\GWall-e\\Geo--WallE\\obj\\",
+      "outputPath": "C:\\Users\\Livi3\\Desktop\\Geo--WallE\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
