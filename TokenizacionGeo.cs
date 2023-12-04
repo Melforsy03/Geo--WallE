@@ -111,7 +111,7 @@ namespace Lexer
                     //tokens funciones 
                     else if (Isfunction(currentToken))
                     {
-                    tokens.Add(new Function(currentToken , TokenTypes.Funcion));
+                    tokens.Add(new token(currentToken , TokenTypes.Comando));
                     i = j;
                     currentToken  = "";
                     break;

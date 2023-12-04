@@ -7,7 +7,7 @@ namespace Usuario
     {
         public static void Main (string [] args)
         {
-         string  a = "Fib (n) =  if n <= 1 then 1 else Fib (n - 1) + Fib (n - 2) ;";
+         string  a = "Fib (n) =  if n <= 1 then 1 else Fib (n - 1) + Fib (n - 2) ; a = 1 + Fib (3);";
 
          List<token> m = Tokenizar.TokenizeString(a);
 
@@ -18,9 +18,10 @@ namespace Usuario
          Geometrico arbol = new Geometrico("" , TokenTypes.Identifier , null);
          arbol.expression = m ;
          
-         arbol.Construir();
-         Console.WriteLine("ya");
+         arbol.Parser();
+        arbol.Evaluate();
+         Console.WriteLine();
         
         }
-}
+ }
 }

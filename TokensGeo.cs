@@ -1,4 +1,5 @@
 using ParserGeo;
+using Lexer;
 namespace TokensGeo
 {
        public enum TokenTypes
@@ -29,13 +30,22 @@ namespace TokensGeo
     }
        public string Evaluar ()
          {
-            return Value;
+          if(this is Identificador) return ((Identificador)this).Evaluar();
+          else if(this is OperatorNode)return ((OperatorNode)this).Evaluar().ToString();
+          else if(this is TokenNumero)return ((TokenNumero)this).Evaluar();
+          else if(this is Function)return((Function)this).Evaluar();
+          else if (this is IfElseNode) return ((IfElseNode)this).Evaluar();
+          return Value ;
          }
 
        }
        public class Identificador : token
        {
         public Identificador (string Value , TokenTypes Type ):base(Value , Type) {}
+        public string Evaluar ()
+        {
+          return tokens[0].Evaluar();
+        }
        }
        public class  tokenBul : token
      {
@@ -57,7 +67,7 @@ namespace TokensGeo
     }
     else if (Value == "<" )
     {
-         numero = double. Parse(tokens[0].Evaluar()) < double.Parse(tokens[1].Evaluar())? 1 : 0 ;
+         numero = (double. Parse(tokens[0].Evaluar()) < double.Parse(tokens[1].Evaluar()))? 1 : 0 ;
     }
     else if (Value == "==" )
     {
@@ -73,25 +83,117 @@ namespace TokensGeo
     }
     else if (Value == "<=" )
     {
-        numero = double. Parse (tokens[0].Evaluar()) <= double.Parse(tokens[1].Evaluar())? 1 : 0;  
+      numero = ( double. Parse (tokens[0].Evaluar()) <= double.Parse(tokens[1].Evaluar()))? 1 : 0;
+        
      }
-     return numero ;
+     return numero;
   
      }
   }
        public class TokenNumero :  token
        {
          public TokenNumero(string Value , TokenTypes Type) : base (Value , Type){}
-       }
-       public class Function : token 
-       {
-        public List<token> globales {get ; set ;}
-         public Function (string Value , TokenTypes Type) : base ( Value , Type) 
+         public string Evaluar ()
          {
-             globales = new List<token>();
+          return Value;
          }
        }
-    
+       public class Function : Geometrico 
+       {
+         public Function (string Value , TokenTypes Type , Geometrico Root ) : base ( Value , Type , Root){} 
+         public string Evaluar ()
+         { 
+           Function b = new Function(Value , TokenTypes.Funcion , Root);
+            if(Root.Value == "") b = (Function)Root.variablesLocales.Find(valor => valor.Value == Value).Clone();
+            else b =  b = (Function)((Function)Root.variablesGlobales.Find(valor => valor.Value == Value)).Clone();
+            for (int i = 0; i < b.variablesLocales.Count; i++)
+            {
+              b.variablesLocales[i].tokens.Add(variablesLocales[i]);
+            }
+            b.variablesGlobales = Root.variablesLocales.Select (p => (token)p.Clone()).ToList();
+            if (b != null && b.tokens[0] is IfElseNode )
+            {
+              return Evaluador(b);
+            }
+            return tokens[0].Evaluar().ToString();
+         }
+        //darle nombre a los parametros de la funcion
+        private string Evaluador (Function Funcion)
+        {
+           // Funcion.variablesLocales = CambioVariableParametro(variablesLocales.Select (p => (token)p.Clone()).ToList(),Funcion.variablesLocales);
+            Funcion.tokens[0].tokens[0].tokens = Funcion.CambioVariableParametro(Funcion.tokens[0].tokens[0].tokens , Funcion.variablesLocales );
+            string valor = Funcion.EvaluadorRecursivo(Funcion , Funcion.variablesLocales , "");
+            return valor;
+        }
+         private List<token> CambioVariableParametro(List<token> variables , List<token> parameter)
+         {
+          if (variables.Count == 0)
+          {
+            return variables;
+          }
+            for(int i = 0 ; i < variables.Count ; i ++)
+             {
+              if (parameter.Any(p => p.Value == variables[i].Value))
+              {
+                token a = (token)parameter.Find(p => p.Value == variables[i].Value).Clone();
+                variables[i] = (token)a.Clone();
+              }
+              else if (parameter.Count == 1 && variables.Count == 1 && variables[0].Type == TokenTypes.Number  )
+              {
+                string Value = variables[0].Value ;
+                variables[0] = (token)parameter[0].Clone();
+                variables[0].tokens.Add(new TokenNumero(Value , TokenTypes.Number));
+              }
+              else
+              {
+                CambioVariableParametro(variables[i].tokens , parameter);
+              }
+            }
+          return variables;
+         }
+         public string EvaluadorRecursivo (token Parent , List<token> parameter,string h)
+         {
+          
+          if (Parent.tokens.Count > 0 && Parent.tokens[0] is IfElseNode )
+          {
+             if(((tokenBul)Parent.tokens[0].tokens[0]).Evaluar() == 1 )  return Parent.tokens[0].tokens[1].Evaluar();
+            
+          }
+              for (int i = 0; i < Parent.tokens.Count; i++)
+              {
+                if (Root.variablesLocales.Any(valor => valor.Value == Parent.tokens[i].Value))
+                {
+                  List<token> VariblesLocalesDos = new List<token>();
+                  VariblesLocalesDos.AddRange(((Function)Parent.tokens[i]).variablesLocales.Select(p => (token)p.Clone()).ToList());
+                  Function FuncionEvaluar = (Function)((Function)Root.variablesLocales.Find(valor => valor.Value == Parent.tokens[i].Value )).Clone();
+                  FuncionEvaluar.variablesLocales = FuncionEvaluar.CambioVariableParametro(VariblesLocalesDos.Select(p => (token)p.Clone()).ToList() , parameter);
+                  FuncionEvaluar.tokens[0].tokens[0].tokens = CambioVariableParametro(FuncionEvaluar.tokens[0].tokens[0].tokens , parameter);
+                  token acumulacion = new token (FuncionEvaluar.EvaluadorRecursivo(FuncionEvaluar, FuncionEvaluar.variablesLocales , h) , TokenTypes.Number);
+                  Console.WriteLine(acumulacion.Value);
+                  token evaluacion = (token)((token)Parent).Clone();
+                  evaluacion.tokens[i] = (token)((token)acumulacion).Clone();
+                 h = evaluacion.Evaluar().ToString();
+                  Console.WriteLine(h);
+                  return h;
+                 }
+                else
+                {
+                  if (Parent.tokens[i] is Geometrico && Parent is Geometrico)
+                  {
+                    ((Geometrico)Parent.tokens[i]).variablesGlobales.AddRange(((Geometrico)Parent).variablesGlobales);
+                     ((Geometrico)Parent.tokens[i]).variablesGlobales.AddRange(((Geometrico)Parent).variablesLocales);
+                    h = EvaluadorRecursivo(((Geometrico)Parent.tokens[i]), parameter , h);
+                  }
+                  else
+                  {
+                    h = EvaluadorRecursivo(Parent.tokens[i], parameter, h );
+          
+                  }
+              }
+            }
+          return h;
+      }
+    }
        public class OperatorNode : token
        {
           public OperatorNode(string Value  , TokenTypes Type ) : base ( Value , Type){}
@@ -102,97 +204,47 @@ namespace TokensGeo
             
        if (Value == "+")
        {
-        
-            try
-            {
-                return double.Parse(tokens[0].Evaluar()) + double.Parse(tokens[1].Evaluar()) ;  
-            }
-            catch (System.Exception)
-            {
-                
-                Console.WriteLine(" error en ejecucuion ,el operador" +  Value + " no puede operar con estos elementos");
-            }
-
+         return double.Parse(tokens[0].Evaluar()) + double.Parse(tokens[1].Evaluar()) ;
        }
        else if (Value == "-")
        {
-         try
-            {
-                return double.Parse(tokens[0].Evaluar()) - double.Parse(tokens[1].Evaluar()) ;  
-            }
-            catch (System.Exception)
-            {
-                
-                Console.WriteLine(" error en ejecucuion ,el operador" +  Value + " no puede operar con estos elementos");
-            }           
-            
+        
+        return double.Parse(tokens[0].Evaluar()) - double.Parse(tokens[1].Evaluar()) ;  
+                  
        }
        else if (Value == "*")
        {
-            try
-            {
-                return double.Parse(tokens[0].Evaluar()) * double.Parse(tokens[1].Evaluar()) ;  
-            }
-            catch (System.Exception)
-            {
-                
-                Console.WriteLine(" error en ejecucuion ,el operador " + Value + " no puede operar con estos elementos");
-            }
+           
+       return double.Parse(tokens[0].Evaluar()) * double.Parse(tokens[1].Evaluar()) ;  
+         
        }
        else if (Value == "/")
        {
-            try
-            {
-                return double.Parse(tokens[0].Evaluar()) / double.Parse(tokens[1].Evaluar()) ;  
-            }
-            catch (System.Exception)
-            {
-                Console.WriteLine(" error en ejecucuion ,el operador " + Value + " no puede operar con estos elementos");
-            }
-        
+          return double.Parse(tokens[0].Evaluar()) / double.Parse(tokens[1].Evaluar()) ;  
        }
         else if (Value == "%")
        {
-            try
-            {
-                return double.Parse(tokens[0].Evaluar()) % double.Parse(tokens[1].Evaluar()) ;  
-            }
-            catch (System.Exception)
-            {
-                Console.WriteLine(" error en ejecucuion ,el operador " + Value + " no puede operar con estos elementos");
-            }
-        
+           
+          return double.Parse(tokens[0].Evaluar()) % double.Parse(tokens[1].Evaluar()) ;  
        }
        else if (Value == "^")
        {
-      try
-      {
+    
         return Math.Pow(double.Parse(tokens[0].Evaluar()) , double.Parse(tokens[1].Evaluar())) ; 
-      }
-      catch (System.Exception)
-      {
-        
-         Console.WriteLine("error en ejecucuion , el operador " + Value + "no opera con esos elementos");
-       }
+    
              
        }
        else if (Value == "Sqrt")
        {
-        try
-        {
+       
         return Math.Sqrt(double.Parse(tokens[0].Evaluar()));
-        }
-        catch (System.Exception)
-        {
-            
-            throw;
-        }
+       
        }
      throw new ArgumentException (" error en ejecucuion ,no se pudo ejecutar esta operacion");
 }
        }
        //figuras de dos puntos como , el segmento , el rayo , medida  entre dos puntos 
-    public class FigDeDosPunto : Geometrico 
+      public class FigDeDosPunto : Geometrico 
     {
           public FigDeDosPunto (string Value , TokenTypes Type , Geometrico root) : base (Value , Type , root)
           {
@@ -224,7 +276,7 @@ namespace TokensGeo
         this.Type = TokenTypes.letIn;
        } 
    }
-       public class IfElseNode : Geometrico
+      public class IfElseNode : Geometrico
    {
       public IfElseNode(string Value ,  TokenTypes Type , Geometrico Padre) : base(Value , Type , Padre){}
       public string Evaluar()
@@ -294,7 +346,7 @@ namespace TokensGeo
        throw new Exception();
     }
 }
- public class TokenSecuencia : token 
+      public class TokenSecuencia : token 
  {
     public List <TokenSecuencia> secuencias {get ; set;} 
     public  List <string> FuncionesEjecutar {get ; set ;}
@@ -347,10 +399,9 @@ namespace TokensGeo
           }
        }
  }
-public class Color : token 
+      public class Color : token 
 {
   public Color (string Value , TokenTypes Type) : base (Value , Type ){}
 
 }
 }
-

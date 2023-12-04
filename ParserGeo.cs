@@ -18,12 +18,14 @@ namespace ParserGeo
       variablesLocales = new List<token>();
       variablesGlobales = new List<token>();
       this.Root = Root;
+      
    }
-    public token Construir()
-     {
-        return Parser ();
-     }
+   public void Evaluate ()
+   {
     
+        Console.WriteLine((variablesLocales[1].tokens[0]).Evaluar());
+   }
+
     public  token Parser()
     {
        return Expresiones();
@@ -72,10 +74,9 @@ namespace ParserGeo
                 {
                     position++;
                 }
-
                 if(auxiliar != null)
                 {
-                    if (Tipos(auxiliar.Type) || auxiliar.Type == TokenTypes.secuencia)
+                    if (Tipos(auxiliar.Type) || auxiliar.Type == TokenTypes.secuencia || auxiliar.Type == TokenTypes.Funcion && !variablesLocales.Any(valor => valor.Value == auxiliar.Value) || auxiliar.Type == TokenTypes.Identifier)
                     {
                         this.variablesLocales.Add(auxiliar);
                     }
@@ -83,6 +84,10 @@ namespace ParserGeo
                     {
                           this.tokens.Add(auxiliar);
                     }
+                if (expression[position].Value == ";")
+                {
+                    position++;
+                }
                 }
                 
             }
@@ -253,6 +258,15 @@ namespace ParserGeo
             position++;
             return DrawFunction();
         }
+        else if (expression[position].Type == TokenTypes.Identifier && expression[position + 1].Value == "=")
+        {
+            position = position + 2 ;
+           Geometrico nodo = new Geometrico(expression[position - 2].Value , TokenTypes.Identifier , this);
+           if (this.variablesLocales != null)nodo.variablesGlobales.AddRange(this.variablesLocales);
+           if(this.variablesGlobales != null)nodo.variablesGlobales.AddRange(this.variablesGlobales);
+           nodo.tokens.Add(ParseExpression());
+            return nodo ;
+        }
         //devuelve un toquen identificador ;
          else if(expression[position].Type == TokenTypes.Identifier ) 
         {
@@ -279,6 +293,8 @@ namespace ParserGeo
     private  token  ParserIFelse()
     {
       IfElseNode ifi = new IfElseNode("if" , TokenTypes.Condicional , Root );
+      ifi.variablesGlobales.AddRange(Root.variablesLocales);
+      ifi.variablesGlobales.AddRange(Root.variablesGlobales);
       ifi.expression = expression;
       ifi.position = position;
       token a = ifi.ParseExpression();
@@ -298,7 +314,7 @@ namespace ParserGeo
     }
     private token FuncionesGeo(string NombreFuncion)
     {
-        Geometrico Funcion = new Geometrico(NombreFuncion , TokenTypes.Funcion , this);
+        Function Funcion = new Function(NombreFuncion , TokenTypes.Funcion , this);
         Funcion.variablesGlobales.AddRange(variablesGlobales);
         Funcion.variablesGlobales.AddRange(variablesLocales);
         Funcion.position = position;
@@ -445,7 +461,7 @@ namespace ParserGeo
   
    public  bool Isfunction(string c) 
    {
-        return c == "sin" || c == "cos" || c == "tan" || c == "Sqrt"  || c == "^";
+        return c == "sin" || c == "cos" || c == "tan" || c == "sqrt"  || c == "^";
   }
 
  public  bool IsOperator(string c)
