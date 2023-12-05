@@ -7,6 +7,8 @@ namespace Lexer
         IdentificadorType,
         FiguraType,
         AnyType,
+        BuleanoType,
+        SecuenciaType,
         ErrorType
     }
 }

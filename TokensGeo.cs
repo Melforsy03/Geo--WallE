@@ -5,7 +5,7 @@ namespace TokensGeo
   public enum TokenTypes
   {
     Keyword, Identifier, Number, Operator, Punctuation, Point, Condicional,
-    Funcion, boolean, letIn, Comando, Line, Segment, Ray, Circle, point_sequence, line_sequence, Underfine, secuencia, Arc , Color
+    Funcion, boolean, letIn, Comando, Line, Segment, Ray, Circle, point_sequence, line_sequence, Underfine, secuencia, Arc , Color, figura , measure
   }
   public interface Evaluacion
   {
@@ -135,36 +135,66 @@ namespace TokensGeo
   }
   public class Function : Geometrico
   {
-    
     public Function(string Value, TokenTypes Type , Geometrico Root) : base(Value, Type , Root){}
-    
   }
   public class FuncionPointsDos : token
   {
     public Point p1;
     public Point p2;
-    private string Value ;
+    public string Value ;
     private Color color;
+    public GeoType GeoType ;
 
-    public FuncionPointsDos(string Value, TokenTypes Type, token point1, token point2, string name, Color color) : base (Value , Type)
+    public FuncionPointsDos(string Value, TokenTypes Type, Point point1, Point point2) : base (Value , Type)
     {
       p1!.x = int.Parse(point1.tokens[0].Value);
       p1.y = int.Parse(point1.tokens[1].Value);
-
       p2!.x = int.Parse(point2.tokens[0].Value);
       p2.y = int.Parse(point2.tokens[1].Value);
-
       this.color = color;
     }
-    public FuncionPointsDos(string Value, TokenTypes Type, string name, Color color) : base(Value, Type)
+    public FuncionPointsDos(string Value, TokenTypes Type) : base(Value, Type)
     {
       Random random = new Random(1000);
       p1!.x = random.Next(1,100);
+      Thread.Sleep(100);
       p1.y = random.Next(1,100); 
-      p2!.x = random.Next(1,100); 
+      Thread.Sleep(100);
+      p2!.x = random.Next(1,100);
+      Thread.Sleep(100);
       p2.y = random.Next(1,100);
+      Thread.Sleep(100);
       this.color = color;
     }
+    token punto1;
+    token punto2;
+    public FuncionPointsDos(string Value, TokenTypes Type , token punto1, token punto2) : base(Value, Type)
+    {
+      this.Value = Value;
+      this.Type = Type;
+      this.punto1 = punto1;
+      this.punto2= punto2;
+    }
+    public bool CheckSemantic(List<Errors> errores)
+    {
+          bool puntos = true ;
+          GeoType = GeoType.FiguraType;
+          if(!p1.CheckSemantic(errores) || p1 == null)
+          {
+           errores.Add(new Errors(ErrorCode.Semantic, "hay error en " + Value + " , el punto uno no fue declarado correctamente"));
+           puntos = false ;
+           GeoType = GeoType.ErrorType;
+           }
+           if(!p2.CheckSemantic(errores) || p2 == null)
+           {
+                errores.Add(new Errors(ErrorCode.Semantic, "hay error en " + Value + " , el punto dos no fue declarado correctamente"));
+                puntos = false ;
+                GeoType = GeoType.ErrorType;  
+           }
+     
+     return puntos ;
+    }
+   
   }
   public class OperatorNode : token
   {
@@ -175,7 +205,7 @@ namespace TokensGeo
     {
       bool parte_izquierda = tokens[0]!.CheckSemantic(errores);
       bool parte_derecha = tokens[1]!.CheckSemantic(errores);
-      if (tokens[0]!.GeoType != GeoType.NumberType || tokens[1]!.GeoType != GeoType.NumberType)
+      if (tokens[0]!.GeoType != tokens[1]!.GeoType)
       {
         errores.Add(new Errors(ErrorCode.Semantic, "no puede utilizar el operador" + Value + " con estos dos elementos"));
         GeoType = GeoType.ErrorType;
@@ -219,33 +249,108 @@ namespace TokensGeo
       return numero;
     }
   }
-  //figuras de dos puntos como , el segmento , el rayo , medida  entre dos puntos 
-  public class FigDeDosPunto : token
-  {
-    public token a { get; set; }
-    public token b { get; set; }
-    public FigDeDosPunto(string Value, TokenTypes Type, token a, token b) : base(Value, Type)
-    {
-      this.Value = Value;
-      this.Type = Type;
-      this.a = a;
-      this.b = b;
-    }
-  }
    public class Arco : Geometrico 
       {
+        Point p1 ;
+        Point p2 ;
+        Point p3 ;
+        token medida ;
+         public GeoType GeoTyper {get ; set ;}
         public Arco (string Value , TokenTypes Type , Geometrico root ) : base (Value , Type , root)
         {
-          this.Value = Value;
-          this.Type = Type;
-          this.Root = Root;
+          Random random = new Random(1000);
+         p1!.x = random.Next(1,100);
+         Thread.Sleep(100);
+         p1.y = random.Next(1,100); 
+         Thread.Sleep(100);
+         p2!.x = random.Next(1,100);
+         Thread.Sleep(100);
+         p2.y = random.Next(1,100);
+         Thread.Sleep(100);
         }
+        
+        public Arco (string Value , TokenTypes Type , Geometrico root , Point p1 , Point p2 ,Point p3 , token medida) :base (Value , Type , root)
+        {
+            this.p1 = p1;
+            this.p2 = p2;
+            this.p3 = p3;
+        }
+         bool puntos = true;
+
+
+       public bool CheckSemantic(List<Errors> errores)
+       {
+        GeoType = GeoType.FiguraType;
+          for (int i = 0; i < tokens.Count - 1; i++)
+         {
+           if (tokens[i].Type != TokenTypes.Point) 
+           {
+           puntos = false;
+           errores.Add(new Errors(ErrorCode.Semantic, "hay error en los parametros del arco, el parametro " + i + "deben ser un punto"));
+           break;
+           }
+         }
+         if(tokens[3].Type != TokenTypes.measure || tokens[3].Type != TokenTypes.Number || (tokens[3].Type == TokenTypes.Identifier && tokens[3].tokens[0].Type == TokenTypes.Number)) puntos = false;
+         if (!puntos)
+          {
+            GeoType = GeoType.ErrorType;
+            errores.Add(new Errors(ErrorCode.Semantic, "hay error en los parametros del arco , se esperaba una medida"));
+            return false;
+          }
+          return true;
       }
-       public class Circunferencia : Geometrico
+    }
+    public class Circunferencia : Geometrico
       {
+        Point p1 ;
+        token medida ;
         public Circunferencia (string Value , TokenTypes Type , Geometrico root ) :base (Value ,Type , root)
         {
+          Random random = new Random(1000);
+          p1!.x = random.Next(1,100);
+          Thread.Sleep(100);
+          p1.y = random.Next(1,100); 
+          Thread.Sleep(100);
+          medida.Value = random.Next(1,20).ToString();
         }
+        public Circunferencia (string Value , TokenTypes Type ,Geometrico root ,Point p1 , token medida ) : base (Value , Type , root)
+        {
+          this.p1 = p1;
+          this.medida = medida;
+        }
+        bool puntos = true;
+        public  GeoType GeoType {get ; set ;}
+        public bool CheckSemantic(List<Errors> errores)
+        {
+         if (tokens.Count > 0)
+         {
+            if (tokens.Count != 2)
+            {
+             errores.Add(new Errors(ErrorCode.Semantic, "la circunferencia recive dos paramros"));
+             GeoType = GeoType.ErrorType;
+             puntos = false ;
+            }
+            else
+            {
+              
+             if(tokens[0].Type != TokenTypes.Point) 
+            {
+             errores.Add(new Errors(ErrorCode.Semantic, "hay error en los parametros de la circunferencia , el primer parametro deben ser un punto"));
+             GeoType = GeoType.ErrorType;
+             puntos = false ;
+             }
+            if(tokens[1].Type != TokenTypes.Number || tokens[1].Type != TokenTypes.measure)
+           {
+            errores.Add(new Errors(ErrorCode.Semantic, "hay error en los parametros de la circunferencia , el segundo parametro debe ser un valor numerico o una madiana "));
+            GeoType = GeoType.ErrorType;
+            puntos = false ;
+           }
+          }
+          if (!puntos)return false;
+         }
+          return true;
+        }
+      
       }
   public class LetIn : Geometrico
   {
@@ -255,7 +360,7 @@ namespace TokensGeo
       this.Type = TokenTypes.letIn;
     }
     public GeoType geoType { get; set; }
-    public override bool CheckSemantic(List<Errors> errores)
+    public  bool CheckSemantic(List<Errors> errores)
     {
       bool expresion_let = false;
       bool expresion_in = false;
@@ -263,17 +368,25 @@ namespace TokensGeo
       {
         expresion_let = expresion_let && variablesLocales[i].CheckSemantic(errores);
       }
-      for (int i = 0; i < this.expression.Count; i++)
+      for (int i = 0; i < this.variablesGlobales.Count; i++)
       {
-        expresion_in = expresion_in && expression[i].CheckSemantic(errores);
+        expresion_in = expresion_in && variablesGlobales[i].CheckSemantic(errores);
       }
 
-      if (!(expresion_let && expresion_in))
+      if (!expresion_let)
       {
+        errores.Add(new Errors(ErrorCode.Semantic, "hay error en la expresion let - in , error en la expresion let "));
         geoType = GeoType.ErrorType;
-        return false;
       }
-
+      if(!expresion_in)
+      {
+        errores.Add(new Errors(ErrorCode.Semantic, "hay error en la expresion let - in , error en la expresion let "));
+        geoType = GeoType.ErrorType;
+      }
+      if (!(expresion_in && expresion_let))
+      {
+        return false ;
+      }
       return true;
     }
   }
@@ -281,20 +394,35 @@ namespace TokensGeo
   {
     public IfElseNode(string Value, TokenTypes Type, Geometrico Padre) : base(Value, Type, Padre) { }
     public GeoType GeoType { get; set; }
-    public override bool CheckSemantic(List<Errors> errores)
+    
+    public bool CheckSemantic(List<Errors> errores)
     {
+         GeoType = GeoType.NumberType;
+      bool condicion = tokens[0]!.CheckSemantic(errores);
       bool parte_if = tokens[1]!.CheckSemantic(errores);
       bool parte_else = tokens[2]!.CheckSemantic(errores);
-
-      if (tokens[1]!.GeoType != GeoType.NumberType)
+     
+      if (!parte_if || tokens[1] == null||tokens[1].tokens.Count == 0)
       {
-        errores.Add(new Errors(ErrorCode.Semantic, "hay error con la expresion if-else"));
+        errores.Add(new Errors(ErrorCode.Semantic, "hay error en la expresion if-else , error en la expresion condicional"));
         GeoType = GeoType.ErrorType;
-        return false;
+        parte_if = false;
+      }
+      if(!parte_else || tokens[2] == null || tokens[2].tokens.Count == 0)
+      {
+        errores.Add(new Errors(ErrorCode.Semantic, "hay error en la expresion if-else , error en la expresion then"));
+        GeoType = GeoType.ErrorType;
+        condicion = false ;
+      }
+      if(!condicion || tokens[0] == null ||tokens[0].tokens.Count == 0)
+      {
+        errores.Add(new Errors(ErrorCode.Semantic, "hay error en la expresion if-else , error en la expresion else "));
+        GeoType = GeoType.ErrorType;
+        parte_else = false ;
       }
 
-      GeoType = GeoType.NumberType;
-      return parte_if && parte_else;
+
+      return parte_if && parte_else && condicion;
     }
     public string Evaluar()
     {
@@ -308,21 +436,21 @@ namespace TokensGeo
       }
     }
   }
-  public class FunctionNode : token
+  public class FunctionNode : Geometrico
   {
-    public FunctionNode(string FunctionName, TokenTypes type) : base(FunctionName, type) { }
-    public GeoType GeoType { get; set; }
-    public override bool CheckSemantic(List<Errors> errores)
+    public FunctionNode(string FunctionName, TokenTypes type , Geometrico root) : base(FunctionName, type , root) { }
+    public GeoType GeoType { get; set;}
+    public  bool CheckSemantic(List<Errors> errores)
     {
       bool argumento = tokens[0]!.CheckSemantic(errores);
-
-      if (tokens[0]!.GeoType == GeoType.NumberType)
+    
+      if (tokens[0].GeoType != GeoType.NumberType)
       {
-        errores.Add(new Errors(ErrorCode.Semantic, "Le debe pasar a la funcion un nmero"));
+        errores.Add(new Errors(ErrorCode.Semantic, "Le debe pasar a la funcion un numero"));
         GeoType = GeoType.ErrorType;
         return false;
       }
-
+    
       GeoType = GeoType.NumberType;
       return argumento;
     }
@@ -332,68 +460,44 @@ namespace TokensGeo
       // Evaluar la función según el nombre
       if (Value == "sin")
       {
-        if (tokens[0].Type == TokenTypes.Operator)
-        {
-          numero = Math.Sin(((OperatorNode)tokens[0]).Evaluar());
-        }
-        else
-        {
-          numero = Math.Sin(Double.Parse(tokens[0].Evaluar()));
-        }
+        numero = Math.Sin(Double.Parse(tokens[0].Evaluar()));
       }
       else if (Value == "cos")
       {
-        if (tokens[0].Type == TokenTypes.Operator)
-        {
-          numero = Math.Cos(((OperatorNode)tokens[0]).Evaluar());
-        }
-        else
-        {
-          numero = Math.Cos(Double.Parse(tokens[0].Evaluar()));
-        }
+        numero = Math.Cos(Double.Parse(tokens[0].Evaluar()));
       }
       else if (Value == "tan")
       {
-        if (tokens[0].Type == TokenTypes.Operator)
-        {
-          numero = Math.Tan(((OperatorNode)tokens[0]).Evaluar());
-        }
-        else
-        {
-          numero = Math.Tan(Double.Parse(tokens[0].Evaluar()));
-        }
+       numero = Math.Tan(Double.Parse(tokens[0].Evaluar()));
       }
       else if (Value == "sqrt")
       {
-        if (tokens[0].Type == TokenTypes.Operator)
-        {
-          numero = Math.Sqrt(((OperatorNode)tokens[0]).Evaluar());
-        }
-        else
-        {
-          numero = Math.Sqrt(Double.Parse(tokens[0].Evaluar()));
-        }
+        numero = Math.Sqrt(Double.Parse(tokens[0].Evaluar()));
       }
       return numero;
     }
   }
-  public class TokenSecuencia : token
+  public class TokenSecuencia : Geometrico
   {
-    public List<TokenSecuencia> secuencias { get; set; }
-    public List<string> FuncionesEjecutar { get; set; }
-    public token Padre { get; set; }
+   
     public GeoType geoType { get; set; }
 
-    public TokenSecuencia(string Value, TokenTypes type, token Padre) : base(Value, type)
+    public TokenSecuencia(string Value, TokenTypes type, Geometrico root) : base(Value, type,root )
     {
-      secuencias = new List<TokenSecuencia>();
-      FuncionesEjecutar = new List<string>();
-      this.Padre = Padre;
+    
     }
-    public override bool CheckSemantic(List<Errors> errores)
+    public void Evaluate()
+    {
+      for (int i = 0; i < variablesLocales.Count; i++)
+      {
+        if(i < tokens.Count - 1)variablesLocales[i].tokens.Add(tokens[i]);
+        else {variablesLocales[i].tokens.Add(new Underfine("Underfine" , TokenTypes.Underfine));}
+      }
+    }
+    public bool CheckSemantic(List<Errors> errores)
     {
       bool expresion = false;
-
+      geoType = GeoType.SecuenciaType;
       for (int i = 0; i < this.tokens.Count; i++)
       {
         expresion = expresion && tokens[i].CheckSemantic(errores);
@@ -407,20 +511,12 @@ namespace TokensGeo
 
       return true;
     }
-    public IEnumerable<token> Underscore(IEnumerable<token> a)
-    {
-      return a.Skip(1);
-    }
-    //devuelve el primer termino de la secuencia
-    public token Rest(IEnumerable<token> a)
-    {
-      IEnumerator<token> c = a.GetEnumerator();
-      c.MoveNext();
-      return c.Current;
-    }
+   
     public IEnumerable<token> Intersect(token a, token b)
     {
-      return a.tokens.Intersect(b.tokens);
+      IEnumerable<token> tokensA = a.tokens;
+      IEnumerable<token> tokensB = b.tokens;
+      return tokensA.Intersect(tokensB);
     }
     public IEnumerable<token> samples()
     {
@@ -430,7 +526,7 @@ namespace TokensGeo
 
       for (int i = 0; i < a.Length; i++)
       {
-        a[i] = new token("p" + i, TokenTypes.Point);
+        a[i] = new Point("p" + i, TokenTypes.Point);
       }
       for (int i = 0; i < a.Length; i++)
       {
@@ -445,6 +541,14 @@ namespace TokensGeo
       {
         yield return ran.Next(1, 101);
       }
+    }
+  }
+  public class Underfine : token
+  {
+    public Underfine(string Value , TokenTypes Type):base(Value , Type)
+    {
+      Value = "Underfine";
+      Type = TokenTypes.Underfine;
     }
   }
 }

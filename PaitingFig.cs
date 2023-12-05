@@ -1,54 +1,73 @@
 using TokensGeo;
-
+using Lexer;
 public enum Color { black, red, blue, green }
 
-public class Point : FuncionPointsDos
+public class Point : token
 {
     public int x;
     public int y;
 
-    public Point(string Value, TokenTypes Type, string name, Color color) : base(Value, Type, name, color)
+    token coordenada_x {get ; set ;}
+    token coordenada_y {get ; set ;}
+
+    public Point(string Value, TokenTypes Type) : base(Value, Type)
     {
+        coordenada_x = null;
+        coordenada_y = null;
         Random random = new Random();
         x = random.Next();
         y = random.Next();
     }
-
-    public Point(string Value, TokenTypes Type, token coordenada_x, token coordenada_y, string name, Color color) : base(Value, Type, name, color)
+    public Point(string Value, TokenTypes Type, token coordenada_x, token coordenada_y) : base(Value, Type)
     {
-        x = int.Parse(coordenada_x.tokens[0].Value);
-        y = int.Parse(coordenada_y.tokens[0].Value);
+        this.coordenada_x = coordenada_x;
+        this.coordenada_y = coordenada_y;
+    }
+    public bool CheckSemantic(List<Errors> errores)
+    {
+        bool coordenadas = true;
+        GeoType = GeoType.FiguraType;
+        if (coordenada_y == null && coordenada_x == null)
+        {
+            return true;
+        }
+        if(coordenada_x.Type != TokenTypes.Number || (coordenada_x.tokens.Count != 0 && !coordenada_x.CheckSemantic(errores)) || coordenada_x.GeoType != GeoType.NumberType )
+        {
+           errores.Add(new Errors(ErrorCode.Semantic,"hay error en " + Value + " , el coordenada uno no fue declarado correctamente"));
+           coordenadas = false ;
+           GeoType = GeoType.ErrorType;
+        }
+        if (coordenada_y.Type != TokenTypes.Number || (coordenada_y.tokens.Count != 0 && !coordenada_y.CheckSemantic(errores)) ||  coordenada_y.GeoType != GeoType.NumberType) 
+        {
+           errores.Add(new Errors(ErrorCode.Semantic, "hay error en " + Value + " , el coordenada dos no fue declarado correctamente"));
+           coordenadas = false ;
+           GeoType = GeoType.ErrorType;
+        }
+        if (!coordenadas)
+        {
+            return false ;
+        }
+        return true ;
     }
 }
 public class Line : FuncionPointsDos
 {
-    public Line(string Value, TokenTypes Type, string name, Color color) : base(Value, Type, name, color) { }
+    public Line(string Value, TokenTypes Type) : base(Value, Type) { }
 
-    public Line(string Value, TokenTypes Type, token point1, token point2, string name, Color color) : base(Value, Type, point1, point2, name, color)
+    public Line(string Value, TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2)
     {
     }
 }
 public class Segment : FuncionPointsDos
 {
-    public Segment(string Value, TokenTypes Type, string name, Color color) : base(Value, Type, name, color) { }
+    public Segment(string Value, TokenTypes Type, string name, Color color) : base(Value, Type) { }
 
-    public Segment(string Value, TokenTypes Type, token point1, token point2, string name, Color color) : base(Value, Type, point1, point2, name, color) { }
+    public Segment(string Value, TokenTypes Type, token point1, token point2, string name, Color color) : base(Value, Type, point1, point2) { }
 }
 public class Ray : FuncionPointsDos
 {
-    public Ray(string Value, TokenTypes Type, string name, Color color) : base(Value, Type, name, color) { }
+    public Ray(string Value, TokenTypes Type) : base(Value, Type) { }
 
-    public Ray(string Value, TokenTypes Type, token point1, token point2, string name, Color color) : base(Value, Type, point1, point2, name, color) { }
+    public Ray(string Value, TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2) { }
 }
-public class Circle : FuncionPointsDos
-{
-    public Circle(string Value, TokenTypes Type, string name, Color color) : base(Value, Type, name, color) { }
 
-    public Circle(string Value, TokenTypes Type, token point1, token point2, string name, Color color) : base(Value, Type, point1, point2, name, color) { }
-}
-public class Arc : FuncionPointsDos
-{
-    public Arc(string Value, TokenTypes Type, string name, Color color) : base(Value, Type, name, color) { }
-
-    public Arc(string Value, TokenTypes Type, token point1, token point2, string name, Color color) : base(Value, Type, point1, point2, name, color) { }
-}
