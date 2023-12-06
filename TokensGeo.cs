@@ -34,13 +34,12 @@ namespace TokensGeo
        public string Evaluar ()
          {
           if(this is Identificador) return ((Identificador)this).Evaluar();
-          else if(this is OperatorNode)return ((OperatorNode)this).Evaluar().ToString();
+          else if(this is OperatorNode)return ((OperatorNode)this).Evaluar().Value.ToString();
           else if(this is TokenNumero)return ((TokenNumero)this).Evaluar();
           else if(this is Function)return((Function)this).Evaluar();
           else if (this is IfElseNode) return ((IfElseNode)this).Evaluar();
           return Value ;
          }
-
     public virtual bool CheckSemantic(List<Errors> errores)
     {
       bool var = false;
@@ -139,19 +138,16 @@ namespace TokensGeo
   }
   public class FuncionPointsDos : token
   {
-    public Point p1;
-    public Point p2;
+    public Point p1 = new Point("punto1" , TokenTypes.Point , null);
+    public Point p2 = new Point ("punto2", TokenTypes.Point, null);
     public string Value ;
-    private Color color;
+
     public GeoType GeoType ;
 
     public FuncionPointsDos(string Value, TokenTypes Type, Point point1, Point point2) : base (Value , Type)
     {
-      p1!.x = int.Parse(point1.tokens[0].Value);
-      p1.y = int.Parse(point1.tokens[1].Value);
-      p2!.x = int.Parse(point2.tokens[0].Value);
-      p2.y = int.Parse(point2.tokens[1].Value);
-      this.color = color;
+     this.p1 = point1;
+     this.p2 = point2;
     }
     public FuncionPointsDos(string Value, TokenTypes Type) : base(Value, Type)
     {
@@ -164,7 +160,7 @@ namespace TokensGeo
       Thread.Sleep(100);
       p2.y = random.Next(1,100);
       Thread.Sleep(100);
-      this.color = color;
+      
     }
     token punto1;
     token punto2;
@@ -216,37 +212,61 @@ namespace TokensGeo
       return parte_izquierda && parte_derecha;
     }
 
-    public double Evaluar()
+    public token Evaluar()
     {
-      // Evaluar la operación según el operador        
-      double numero = 0;
-
+      // Evaluar la operación según el operador   
       if (Value == "+")
       {
-        numero = double.Parse(tokens[0].Evaluar()) + double.Parse(tokens[1].Evaluar());
+       if(tokens[0].Type == TokenTypes.Underfine && tokens[0].Type == TokenTypes.secuencia)
+       {
+          return CalculoSecuencia (tokens[0] , tokens[1]);
+       }
+       else
+       {
+        return new TokenNumero(( double.Parse(tokens[0].Evaluar()) + double.Parse(tokens[1].Evaluar())).ToString() ,TokenTypes.Number);
+       }
+      
       }
       else if (Value == "-")
       {
-        numero = double.Parse(tokens[0].Evaluar()) - double.Parse(tokens[1].Evaluar());
+        return new TokenNumero(( double.Parse(tokens[0].Evaluar()) - double.Parse(tokens[1].Evaluar())).ToString() ,TokenTypes.Number ) ;
       }
       else if (Value == "*")
       {
-        numero = double.Parse(tokens[0].Evaluar()) * double.Parse(tokens[1].Evaluar());
+        return new TokenNumero(( double.Parse(tokens[0].Evaluar()) * double.Parse(tokens[1].Evaluar())).ToString() , TokenTypes.Number);
       }
       else if (Value == "/")
       {
-        numero = double.Parse(tokens[0].Evaluar()) / double.Parse(tokens[1].Evaluar());
+        return new TokenNumero(( double.Parse(tokens[0].Evaluar()) /double.Parse(tokens[1].Evaluar())).ToString() , TokenTypes.Number);
       }
       else if (Value == "%")
       {
-        numero = double.Parse(tokens[0].Evaluar()) % double.Parse(tokens[1].Evaluar());
+        return new TokenNumero(( double.Parse(tokens[0].Evaluar()) % double.Parse(tokens[1].Evaluar())).ToString() , TokenTypes.Number);
       }
       else if (Value == "^")
       {
-        numero = int.Parse(tokens[0].Evaluar()) ^ int.Parse(tokens[1].Evaluar());
+        return new TokenNumero(( int.Parse(tokens[0].Evaluar()) ^ int.Parse(tokens[1].Evaluar())).ToString() , TokenTypes.Number);
       }
 
-      return numero;
+      return null;
+    }
+    private token CalculoSecuencia(token secuencia1 , token secuencia2)
+    {
+      if (secuencia1 is Underfine || secuencia2 is Underfine || secuencia2.tokens.Count > 25)
+      {
+        return secuencia1;
+      }
+      else
+      {
+       foreach (var item in secuencia2.tokens)
+      {
+        if (!secuencia1.tokens.Any(obj => obj.Value == item.Value ))
+        {
+          secuencia1.tokens.Add(item);
+        }
+      }
+      }
+      return secuencia1;
     }
   }
    public class Arco : Geometrico 
@@ -302,10 +322,13 @@ namespace TokensGeo
     }
     public class Circunferencia : Geometrico
       {
-        Point p1 ;
-        token medida ;
+        Point p1 = new Point("punto", TokenTypes.Point , null);
+
+        token medida = new Measure("medida", TokenTypes.measure);
+        
         public Circunferencia (string Value , TokenTypes Type , Geometrico root ) :base (Value ,Type , root)
         {
+          
           Random random = new Random(1000);
           p1!.x = random.Next(1,100);
           Thread.Sleep(100);
@@ -526,7 +549,7 @@ namespace TokensGeo
 
       for (int i = 0; i < a.Length; i++)
       {
-        a[i] = new Point("p" + i, TokenTypes.Point);
+        a[i] = new Point("p" + i, TokenTypes.Point , null);
       }
       for (int i = 0; i < a.Length; i++)
       {

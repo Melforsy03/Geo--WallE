@@ -49,17 +49,7 @@ namespace ParserGeo
           while (position < expression.Count - 1)
           {
         // la funcion Tipos me devuelve True si es tipo point , segmento , circulo , arco ,line o color
-            if (Tipos(expression[position].Type))
-            {
-                //agrega el token a las variables locales 
-                this.variablesLocales.Add((token)expression[position].Clone());
-                position++;
-                if (expression[position].Value == ";")
-                {
-                    position++;
-                }
-                Expresiones();
-            }
+         
             if ( expression[position].Value == "if" )
             {
                 position++;
@@ -84,27 +74,24 @@ namespace ParserGeo
                 this.tokens.Add(auxiliar);
                 
             }
-            else if(position < expression.Count - 1) 
+            else  
             {
                 auxiliar = ParseExpression();
-                if (expression[position].Value == ",")
+            if (Tipos(auxiliar.Type) || auxiliar.Type == TokenTypes.secuencia || auxiliar.Type == TokenTypes.Funcion || auxiliar.Type == TokenTypes.Identifier)
+            {
+                //agrega el token a las variables locales 
+                this.variablesLocales.Add((token)auxiliar.Clone());
+                position++;
+                
+                Expresiones();
+            }
+              else if(auxiliar != null )
+                {
+                  this.tokens.Add(auxiliar);
+                }
+                if (position < expression.Count - 1 && expression[position].Value == ";")
                 {
                     position++;
-                }
-                if(auxiliar != null)
-                {
-                    if (Tipos(auxiliar.Type) || auxiliar.Type == TokenTypes.secuencia || auxiliar.Type == TokenTypes.Funcion && !variablesLocales.Any(valor => valor.Value == auxiliar.Value) || auxiliar.Type == TokenTypes.Identifier)
-                    {
-                        this.variablesLocales.Add(auxiliar);
-                    }
-                    else
-                    {
-                          this.tokens.Add(auxiliar);
-                    }
-                if (expression[position].Value == ";")
-                {
-                    position++;
-                }
                 }
                 
             }
@@ -159,8 +146,9 @@ namespace ParserGeo
                  return operatorNode;
                 
             }   
-            else if (c == "(")
+            else if (c == "(" )
             {
+
                 return ParseTerm();
             }
             else if (c == ">" || c == "<" || c == "<=" || c == ">=" ||  c == "!=" || c == "==" )
@@ -186,6 +174,14 @@ namespace ParserGeo
             {
                 position++;
                 return Letin();
+            }
+            else if ( c == ";" )
+            {
+                break;
+            }
+            else if (c == ",")
+            {
+                return leftNode;
             }
            
         }
@@ -228,10 +224,11 @@ namespace ParserGeo
             return FuncionesGeo(ValorDelToken);
          }
          //devuelve una figura
-         else if((expression[position].Type == TokenTypes.Identifier && expression[position + 1].Value == "=" && TiposFigura(expression[position + 2].Value)) || TiposFigura(ValorDelToken) || variablesLocales.Any(p => p.Value == Value))
+         else if( TiposFigura(ValorDelToken) || variablesLocales.Any(valor => valor.Value == Value))
         {
            return Figura(ValorDelToken);
         }
+       
          //me devuelve una secuencia 
         else if(LineSecuenceTipo())
         {
@@ -288,7 +285,7 @@ namespace ParserGeo
           else if(variablesGlobales.Any(valor => valor.Value == expression[position].Value))
           {
             position++;
-            return (token)variablesGlobales.Find(valor => valor.Value== expression[position- 1].Value ).Clone();
+            return (token)variablesGlobales.Find(valor => valor.Value== expression[position - 1].Value ).Clone();
           }
           else
           {
@@ -372,51 +369,77 @@ namespace ParserGeo
         return Funcion;
     }
     //definicion de un figura con nombre 
-    private token Figura (string c)
+    private token Figura (string nombreFigura)
     {
         token fig = new token("", TokenTypes.Identifier);
-        if (TiposFigura(c))
+        if (TiposFigura(nombreFigura))
         {
-          if(c == "line" || c == "segment" ||c == "ray" || c == "measure")
-          fig = new FuncionPointsDos(c,ValorNombreFigura(c) );
-          else if (c == "circle")
+          if(nombreFigura == "line" || nombreFigura == "segment" ||nombreFigura == "ray" || nombreFigura == "measure" )
           {
-            fig = new Circunferencia (c , ValorNombreFigura(c) , this);
+           if (expression[position + 1].Type == TokenTypes.Identifier)
+           {
+           fig = new FuncionPointsDos(expression[position + 1].Value,ValorNombreFigura(nombreFigura) );
+           position+=2;
+           }
+            else
+            {
+             fig = new FuncionPointsDos(expression[position].Value,ValorNombreFigura(nombreFigura));
+             position++;
+            }
+           
           }
-          else if ( c == "arc")
+          else if (nombreFigura == "circle")
           {
-            fig = new Arco(c ,ValorNombreFigura(c) , this);
+            if (expression[position + 1].Type == TokenTypes.Identifier)
+            {
+            fig = new Circunferencia (expression[position + 1].Value , ValorNombreFigura(nombreFigura) , this);
+             position += 2;
+            }
+            else
+            {
+                fig = new Circunferencia(expression[position].Value,ValorNombreFigura(nombreFigura) , this);
+                position++;
+            }
+          }
+          else if ( nombreFigura == "arc")
+          {
+            if (expression[position + 1].Type == TokenTypes.Identifier)
+            {
+            fig = new Arco(expression[position + 1].Value ,ValorNombreFigura(nombreFigura) , this);
+             position += 2;
+            }
+            else
+            {
+             fig = new Arco(expression[position ].Value ,ValorNombreFigura(nombreFigura) , this);
+             position++;
+            }
+          }
+          else if(nombreFigura == "point")
+          {
+            if (expression[position + 1].Type == TokenTypes.Identifier)
+            {
+            fig = new Point (expression[position + 1].Value , ValorNombreFigura(nombreFigura) , this);
+            position += 2;
+            }
+            else
+            {
+             fig = new Point (expression[position].Value , ValorNombreFigura(nombreFigura) , this);
+             position++;
+            }
           }
         }
-        else if (variablesLocales.Any (p => p.Value == expression[position + 2].Value ))
-        {
-            token VariableEncontrada = variablesLocales.Find(p => p.Value == expression[position + 2].Value );
-            fig = (token)VariableEncontrada.Clone();
-            fig.Value = c ;
-            position = position + 3;
-            return fig ;
-        }
-        else if(TiposFigura(expression[position + 2].Value)) 
-        {
-          if(expression[position].Value == "line" || expression[position].Value == "segment" ||expression[position].Value == "ray" || expression[position].Value == "measure")
-          fig = new FuncionPointsDos(c , ValorNombreFigura(expression[position + 2].Value) );
-          else if (expression[position].Value == "circle")
-          {
-            fig = new Circunferencia(c , TokenTypes.Circle , this);
-          }
-          else if (expression[position].Value == "arc")
-          {
-            fig = new Arco (c , TokenTypes.Arc , this);
-          }
-           position = position + 3 ;
-        }
+            if (expression[position].Value == ";")return fig ;
+            
             while(expression[position].Value != ")")
             {
                if (expression[position].Value == "(" || expression[position].Value == ","  || expression[position].Value == ")") position++;
-               fig.tokens.Add(ParseExpression());
+               fig.tokens.Add(ParseTerm());
+               if (expression[position].Value == ")")
+               {
                while (expression[position].Value != ")")
                {
                     position++;
+               }
                }
                if (expression[position].Value == ";")
                {
@@ -424,11 +447,11 @@ namespace ParserGeo
                }
             }
             position++;
-            if (fig.Type != TokenTypes.Circle && fig.Type != TokenTypes.Arc)
+            if (fig.Type != TokenTypes.Circle && fig.Type != TokenTypes.Arc && fig.Type != TokenTypes.Point)
             {
             if (fig.tokens.Count == 0)
             {
-                return new FuncionPointsDos(fig.Value ,fig.Type);
+                return fig;
             }
             if(fig.tokens.Count != 0 && fig.tokens[0].Type == TokenTypes.Point && fig.tokens[0].tokens.Count != 0 && fig.tokens[1].tokens.Count != 0)
             {
@@ -443,11 +466,33 @@ namespace ParserGeo
             {
                 if (fig.tokens.Count == 0)
                 {
-                    return new Circunferencia(fig.Value, fig.Type ,this);
+                    return fig;
                 }
                 if(fig.tokens.Count != 0 && fig.tokens[0].Type == TokenTypes.Point && (fig.tokens[1].Type == TokenTypes.measure || fig.tokens[1].Type == TokenTypes.Number || fig.tokens[1].Type == TokenTypes.Operator) && fig.tokens[0].tokens.Count != 0 )
                 {
                     return new Circunferencia(fig.Value , fig.Type , this ,(Point)fig.tokens[0] ,fig.tokens[1]);
+                }
+            }
+            else if(fig.Type == TokenTypes.Point)
+            {
+                if(fig.tokens.Count == 0 )
+                {
+                    return fig;
+                }
+                if(fig.tokens.Count != 0)
+                {
+                 return new Point (fig.Value , fig.Type , fig.tokens[0] , fig.tokens[1] , this);
+                }
+            }
+            else if(fig.Type == TokenTypes.measure)
+            {
+                 if(fig.tokens.Count == 0 )
+                {
+                    return fig;
+                }
+                if(fig.tokens.Count != 0)
+                {
+                 return new Measure (fig.Value , fig.Type , fig.tokens[0] , fig.tokens[1] );
                 }
             }
         
@@ -551,7 +596,7 @@ namespace ParserGeo
     }
     public static bool TiposFigura(string tipoFigura)
     {
-        return tipoFigura == "line" || tipoFigura == "segment" || tipoFigura == "circle" || tipoFigura =="point" || tipoFigura == "measure";
+        return tipoFigura == "line" || tipoFigura == "segment" || tipoFigura == "circle" ||tipoFigura =="point"|| tipoFigura == "measure";
     }
     public static bool TipoSecuencia(string TipoSecuencia)
     {
@@ -654,11 +699,11 @@ namespace ParserGeo
   }
   public bool LineSecuenceTipo ()
   {
-    return ((expression[position].Type == TokenTypes.Identifier && variablesLocales.Any(valor => valor.Value == expression[position].Value) == false && expression[position + 1].Value == "," && variablesGlobales.Any(valor => valor.Value == expression[position].Value) == false) || (expression[position + 1].Value == "=" && expression[position + 2].Value == "{")) || (expression[position] is Identificador && expression [position + 1].Value == "=" && TipoSecuencia(expression[position + 2].Value)) || (position + 2 < expression.Count - 1 && expression[position] is Identificador && variablesLocales.Any (p => p.Value == expression[position + 2].Value)) || (expression[position].Value == "_" || expression[position].Value == "rest") || TipoSecuencia(expression[position].Value) ;
+    return ((expression[position].Type == TokenTypes.Identifier && variablesLocales.Any(valor => valor.Value == expression[position].Value) == false  && variablesGlobales.Any(valor => valor.Value == expression[position].Value) == false) ||  expression[position + 2].Value == "{") || TipoSecuencia(expression[position].Value) ;
   }
   public Geometrico DrawFunction()
   {
-    Geometrico drawFuncion = new Geometrico("draw" , TokenTypes.Funcion, this);
+    Geometrico drawFuncion = new Geometrico("draw" , TokenTypes.Comando, this);
     if (TiposFigura (expression[position].Value))
     {
         drawFuncion.Value = expression[position].Value;
@@ -672,12 +717,9 @@ namespace ParserGeo
     if(expression[drawFuncion.position].Value == "(")drawFuncion.position++;
     while (expression[drawFuncion.position].Value != ";")
     {
-        drawFuncion.tokens.Add(drawFuncion.ParseExpression());
-        if(expression[drawFuncion.position].Value == ",")
-        {
-            drawFuncion.position++;
-        }
-        else if (expression[drawFuncion.position].Value == ")")
+        drawFuncion.tokens.Add(drawFuncion.ParseTerm());
+        
+        if (expression[drawFuncion.position].Value == ")")
         {
             while(expression[position].Value != ")" )
         {
@@ -687,14 +729,16 @@ namespace ParserGeo
                 break; 
             }
         }
-        if (expression[drawFuncion.position].Value == ";")
+        }
+        if(expression[drawFuncion.position].Value == ",") drawFuncion.position++;
+        else if (expression[drawFuncion.position].Value == ";")
         {
-             position = drawFuncion.position;
-            break;
+            position = drawFuncion.position;
+              break;
         }
-        }
-       
+        
     } 
+    
     return drawFuncion;
   }
   private TokenTypes ValorNombreFigura (string c )
@@ -722,6 +766,10 @@ namespace ParserGeo
     if (c == "arc")
     {
         return TokenTypes.Arc;
+    }
+    if(c == "measure")
+    {
+        return TokenTypes.measure;
     }
     return TokenTypes.Point;
   }

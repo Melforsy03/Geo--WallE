@@ -124,58 +124,6 @@ namespace Lexer
                     currentToken  = ""; 
                     break;
                     }
-                     if (tokens.Count > 0 && tokens[tokens.Count - 1].Type == TokenTypes.Comando)
-                       {
-                            if (tokens[tokens.Count - 1].Value == "point")
-                            {
-                               tokens[tokens.Count - 1] = new token(currentToken , TokenTypes.Point);
-                               currentToken = "";
-                               i = j ;
-                               break;
-                            }
-                           else if (tokens[tokens.Count - 1].Value == "line")
-                            {
-                               tokens[tokens.Count - 1] = new token(currentToken , TokenTypes.Line);
-                                currentToken = "";
-                               i = j ;
-                               break;
-                            }
-                           else if (tokens[tokens.Count - 1].Value == "segment")
-                            {
-                               tokens[tokens.Count - 1] = new token(currentToken , TokenTypes.Segment);
-                                currentToken = "";
-                               i = j ;
-                               break;
-                            }
-                          else if (tokens[tokens.Count - 1].Value == "ray")
-                            {
-                               tokens[tokens.Count - 1] = new token(currentToken , TokenTypes.Ray);
-                                currentToken = "";
-                               i = j ;
-                               break;
-                            }
-                           else if (tokens[tokens.Count - 1].Value == "circle")
-                            {
-                               tokens[tokens.Count - 1] = new token(currentToken , TokenTypes.Circle);
-                                currentToken = "";
-                               i = j ;
-                               break;
-                            }
-                           else if (tokens[tokens.Count - 1].Value == "point sequence")
-                            {
-                               tokens[tokens.Count - 1] = new token(currentToken , TokenTypes.point_sequence);
-                                currentToken = "";
-                               i = j ;
-                               break;
-                            }
-                          else if (tokens[tokens.Count - 1].Value == "line sequence")
-                            {
-                               tokens[tokens.Count - 1] = new token(currentToken , TokenTypes.line_sequence);
-                               currentToken = "";
-                               i = j ;
-                               break;
-                            }
-                       }
                       if (input[j] == ' ')
                     {
                          tokens.Add(new Identificador (currentToken , TokenTypes.Identifier));
@@ -212,11 +160,11 @@ namespace Lexer
      }
       public static bool IsComando(string c)
      {
-        return c == "let" || c == "in" || c =="point" || c == "line" || c == "segment" || c == "ray" || c == "circle" || c == "sequence" ;
+        return c == "let" || c == "in" || c =="point" || c == "line" || c == "segment" || c == "ray" || c == "circle" || c == "sequence" || c == "draw";
      }
       public  static bool Isfunction(string c)
      {
-        return c == "color" || c == "restore" || c == "import" || c == "draw"  || c == "arc" || c == "measure" || c == "intersect" || c == "counts" || c == "randoms" || c == "points" || c == "samples" || c == "underfine" || c == "rest" || c == "_";
+        return c == "color" || c == "restore" || c == "import" || c == "arc" || c == "measure" || c == "intersect" || c == "counts" || c == "randoms" || c == "points" || c == "samples" || c == "underfine" || c == "rest" || c == "_";
      }
      public static bool IsKeyword(string c)
      {

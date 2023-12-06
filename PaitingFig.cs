@@ -1,8 +1,9 @@
 using TokensGeo;
 using Lexer;
+using ParserGeo;
 public enum Color { black, red, blue, green }
 
-public class Point : token
+public class Point : Geometrico
 {
     public int x;
     public int y;
@@ -10,7 +11,7 @@ public class Point : token
     token coordenada_x {get ; set ;}
     token coordenada_y {get ; set ;}
 
-    public Point(string Value, TokenTypes Type) : base(Value, Type)
+    public Point(string Value, TokenTypes Type , Geometrico root) : base(Value, Type , root)
     {
         coordenada_x = null;
         coordenada_y = null;
@@ -18,7 +19,7 @@ public class Point : token
         x = random.Next();
         y = random.Next();
     }
-    public Point(string Value, TokenTypes Type, token coordenada_x, token coordenada_y) : base(Value, Type)
+    public Point(string Value, TokenTypes Type, token coordenada_x, token coordenada_y , Geometrico root) : base(Value, Type , root)
     {
         this.coordenada_x = coordenada_x;
         this.coordenada_y = coordenada_y;
@@ -60,14 +61,21 @@ public class Line : FuncionPointsDos
 }
 public class Segment : FuncionPointsDos
 {
-    public Segment(string Value, TokenTypes Type, string name, Color color) : base(Value, Type) { }
+    public Segment(string Value, TokenTypes Type) : base(Value, Type) { }
 
-    public Segment(string Value, TokenTypes Type, token point1, token point2, string name, Color color) : base(Value, Type, point1, point2) { }
+    public Segment(string Value, TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2) { }
 }
 public class Ray : FuncionPointsDos
 {
     public Ray(string Value, TokenTypes Type) : base(Value, Type) { }
 
     public Ray(string Value, TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2) { }
+}
+public class Measure : FuncionPointsDos
+{
+    public Measure (string Value , TokenTypes Type) : base (Value , Type){}
+
+    public Measure(string Value, TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2) { }
+
 }
 
