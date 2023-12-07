@@ -314,7 +314,7 @@ namespace ParserGeo
         }
         else if (expression[position].Type == TokenTypes.Identifier && !variablesGlobales.Any(nombre => nombre.Value == ValorDelToken) && !variablesLocales.Any(nombre => nombre.Value == ValorDelToken))
        {
-        position++;
+         position++;
          errores.Add(new Errors(ErrorCode.Semantic , "esta varariable no esta definida en este contexto"));
          return expression[position - 1];
        }
@@ -632,7 +632,7 @@ namespace ParserGeo
         {
             if (expression[position].Value == "(") parentesis++;
             if (expression[position].Value == ",")position++;
-             tokens.Add(ParseTerm());
+             secuencia.tokens.Add(ParseTerm());
              while(expression[position].Value != ")")
              {
                 parentesis--;
@@ -668,18 +668,20 @@ namespace ParserGeo
       if (expression[position].Type == TokenTypes.Identifier)
     {
         secuencia.Value = expression[position].Value;
-        position++;
-        while (expression[position].Value  != ",")
+            
+        while (expression[position].Value  != "=")
         {
-            secuencia.tokens.Add((token)expression[position].Clone());
+             if (expression[position].Value == ",")
+            {
+                position++;
+            }
+            secuencia.secuencias.Add((token)expression[position].Clone());
+            position++;
             if (expression[position].Value == "=" || expression[position].Value == ";")
             {
                 break;
             }
-            if (expression[position].Value == ",")
-            {
-                position++;
-            }
+           
         }
          if (expression[position].Value != "=")
         {
@@ -692,7 +694,6 @@ namespace ParserGeo
             corchetes++;
             while (expression[position].Value != "}")
             {
-               
                 secuencia.tokens.Add(ParseTerm());
                 if (position > expression.Count - 1)
                 {
@@ -806,14 +807,32 @@ namespace ParserGeo
   }
   public token SecuenciaFinita()
   {
-    token secuencia = new token("contenedor" , TokenTypes.Identifier);
+    token secuencia = new token("contenedor" , TokenTypes.secuencia);
     List<token> componentes = new List<token>();
     int posibleVacio = 35;
     while (expression[position].Value != "}")
     {
-        componentes.Add(ParseTerm());
+        if (variablesLocales.Any(valor => valor.Value == expression[position].Value ))
+        {
+            componentes.Add((token)variablesLocales.Find(valor => valor.Value == expression[position].Value).Clone());
+            position++;
+        }
+        else if (variablesGlobales.Any(valor => valor.Value == expression[position].Value ))
+        {
+             componentes.Add((token)variablesGlobales.Find(valor => valor.Value == expression[position].Value).Clone());
+             position++;
+        }
+        else
+        {
+             if (expression[position].Value != "}")componentes.Add((token)expression[position].Clone());
+             position++;
+        }
         posibleVacio--;
         if (expression[position].Value == ",")position++;
+        if(expression[position].Value == "}")
+        {
+            break ;
+        }
         if (expression[position].Value == ";")
         {
             errores.Add(new Errors(ErrorCode.Semantic , "esperabamos un corchete de cierre"));

@@ -76,7 +76,7 @@ namespace Lexer
                        continue;
                     }
                     //si hay un comando compuesto como point sequence o line sequence 
-                    else if (IsComando(currentToken) && currentToken == "sequence")
+                    else if (tokens.Count > 0 && IsComando(currentToken) && currentToken == "sequence")
                     {
                         if (tokens[tokens.Count - 1].Value == "point")
                         {
@@ -167,7 +167,7 @@ namespace Lexer
      }
       public static bool IsComando(string c)
      {
-        return c == "let" || c == "in" || c =="point" || c == "line" || c == "segment" || c == "ray" || c == "circle" || c == "sequence" || c == "draw";
+        return c == "let" || c == "in" || c =="point" || c == "line" || c == "segment" || c == "ray" || c == "circle" || c == "draw";
      }
       public  static bool Isfunction(string c)
      {
