@@ -34,7 +34,7 @@ namespace TokensGeo
        public string Evaluar ()
          {
           if(this is Identificador) return ((Identificador)this).Evaluar();
-          else if(this is OperatorNode)return ((OperatorNode)this).Evaluar().Value.ToString();
+          else if(this is OperatorNode)return ((OperatorNode)this).Evaluar();
           else if(this is TokenNumero)return ((TokenNumero)this).Evaluar();
           else if(this is Function)return((Function)this).Evaluar();
           else if (this is IfElseNode) return ((IfElseNode)this).Evaluar();
@@ -212,43 +212,42 @@ namespace TokensGeo
       return parte_izquierda && parte_derecha;
     }
 
-    public token Evaluar()
+    public string Evaluar()
     {
+    
       // Evaluar la operación según el operador   
       if (Value == "+")
       {
-       if(tokens[0].Type == TokenTypes.Underfine && tokens[0].Type == TokenTypes.secuencia)
-       {
-          return CalculoSecuencia (tokens[0] , tokens[1]);
-       }
-       else
-       {
-        return new TokenNumero(( double.Parse(tokens[0].Evaluar()) + double.Parse(tokens[1].Evaluar())).ToString() ,TokenTypes.Number);
-       }
       
+        return  (double.Parse(tokens[0].Evaluar()) + double.Parse(tokens[1].Evaluar())).ToString();
+       
       }
       else if (Value == "-")
       {
-        return new TokenNumero(( double.Parse(tokens[0].Evaluar()) - double.Parse(tokens[1].Evaluar())).ToString() ,TokenTypes.Number ) ;
+           return  (double.Parse(tokens[0].Evaluar()) - double.Parse(tokens[1].Evaluar())).ToString();
       }
       else if (Value == "*")
       {
-        return new TokenNumero(( double.Parse(tokens[0].Evaluar()) * double.Parse(tokens[1].Evaluar())).ToString() , TokenTypes.Number);
+           return (double.Parse(tokens[0].Evaluar()) * double.Parse(tokens[1].Evaluar())).ToString();
+  
       }
       else if (Value == "/")
       {
-        return new TokenNumero(( double.Parse(tokens[0].Evaluar()) /double.Parse(tokens[1].Evaluar())).ToString() , TokenTypes.Number);
+           return  (double.Parse(tokens[0].Evaluar()) / double.Parse(tokens[1].Evaluar())).ToString();
+        
       }
       else if (Value == "%")
       {
-        return new TokenNumero(( double.Parse(tokens[0].Evaluar()) % double.Parse(tokens[1].Evaluar())).ToString() , TokenTypes.Number);
+           return  (double.Parse(tokens[0].Evaluar()) % double.Parse(tokens[1].Evaluar())).ToString();
+    
       }
       else if (Value == "^")
       {
-        return new TokenNumero(( int.Parse(tokens[0].Evaluar()) ^ int.Parse(tokens[1].Evaluar())).ToString() , TokenTypes.Number);
+           return  (int.Parse(tokens[0].Evaluar()) ^ int.Parse(tokens[1].Evaluar())).ToString();
+
       }
 
-      return null;
+      return "";
     }
     private token CalculoSecuencia(token secuencia1 , token secuencia2)
     {
@@ -508,14 +507,7 @@ namespace TokensGeo
     {
        secuencias = new List<token>();
     }
-    public void Evaluate()
-    {
-      for (int i = 0; i < secuencias.Count; i++)
-      {
-        if(i < tokens.Count - 1)secuencias[i].tokens.Add(tokens[i]);
-        else {secuencias[i].tokens.Add(new Underfine("Underfine" , TokenTypes.Underfine));}
-      }
-    }
+   
     public bool CheckSemantic(List<Errors> errores)
     {
       bool expresion = false;

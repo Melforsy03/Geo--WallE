@@ -171,7 +171,7 @@ namespace Lexer
      }
       public  static bool Isfunction(string c)
      {
-        return c == "color" || c == "restore" || c == "import" || c == "arc" || c == "measure" || c == "intersect" || c == "counts" || c == "randoms" || c == "points" || c == "samples" || c == "underfine" || c == "rest" || c == "_";
+        return c == "color" || c == "restore" || c == "import" || c == "arc" || c == "measure" || c == "intersect" || c == "counts" || c == "randoms" || c == "points" || c == "samples" || c == "underfine" ;
      }
      public static bool IsKeyword(string c)
      {

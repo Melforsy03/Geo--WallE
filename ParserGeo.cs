@@ -80,7 +80,7 @@ namespace ParserGeo
             else  
             {
                 auxiliar = ParseExpression();
-            if (Tipos(auxiliar.Type) || auxiliar.Type == TokenTypes.secuencia || auxiliar.Type == TokenTypes.Funcion || auxiliar.Type == TokenTypes.Identifier)
+            if (Tipos(auxiliar.Type) || auxiliar.Type == TokenTypes.Funcion || auxiliar.Type == TokenTypes.Identifier)
             {
                 //agrega el token a las variables locales 
                 this.variablesLocales.Add((token)auxiliar.Clone());
@@ -88,7 +88,7 @@ namespace ParserGeo
                 
                 Expresiones();
             }
-              else if(auxiliar != null )
+              else if(auxiliar != null || auxiliar.Type != TokenTypes.secuencia)
                 {
                   this.tokens.Add(auxiliar);
                 }
@@ -178,11 +178,11 @@ namespace ParserGeo
                 position++;
                 return Letin();
             }
-            else if ( c == ";" )
+            else if ( c == ";"  || c== ",")
             {
-                break;
+                return leftNode;
             }
-            else if (c == ",")
+            else if (c== "in")
             {
                 return leftNode;
             }
@@ -231,9 +231,14 @@ namespace ParserGeo
         {
            return Figura(ValorDelToken);
         }
+         else if (expression[position].Type == TokenTypes.Identifier && expression[position + 1].Value == "=" && expression[position + 2].Value != "{")
+        {
+           position ++;;
+           return Identificadores();
+        }
          else if(LineSecuenceTipo())
         {
-            return LineSecuence(expression[position].Value);
+           return LineSecuence(expression[position].Value);
         }
         else if (expression[position].Type == TokenTypes.Underfine)
        {
@@ -271,12 +276,6 @@ namespace ParserGeo
             position++;
             return DrawFunction();
         }
-        //retorna un identificador que este igualado a algo
-        else if (expression[position].Type == TokenTypes.Identifier && expression[position + 1].Value == "=")
-        {
-           position = position + 2;
-           return Identicadores();
-        }
         //devuelve un toquen identificador;
          else if(expression[position].Type == TokenTypes.Identifier ) 
         {
@@ -299,7 +298,6 @@ namespace ParserGeo
              Identificador nodo = new Identificador(expression[position].Value , TokenTypes.Identifier);
              return nodo ;
           }
-           
         }
         else if (ValorDelToken == "{")
         {
@@ -319,7 +317,7 @@ namespace ParserGeo
          return expression[position - 1];
        }
      
-     return node ;
+        return node ;
   }
     //Para recorrer las funciones como sen , cos , tan , arct , cot
     private token ParseFunction(token funcion )
@@ -444,17 +442,30 @@ namespace ParserGeo
             }
           }
         }
-            if (expression[position].Value == ";")return fig ;
-            
+         if (expression[position].Value == ";")return fig ;
             while(expression[position].Value != ")")
             {
                if (expression[position].Value == "(" || expression[position].Value == ","  || expression[position].Value == ")") position++;
-               fig.tokens.Add(ParseTerm());
+               if (variablesLocales.Any (valor => valor.Value == expression[position].Value))
+               {
+                fig.tokens.Add((token)variablesLocales.Find (valor => valor.Value == expression[position].Value).Clone());
+                position++;
+               }
+               else if (variablesGlobales.Any(valor => valor.Value == expression[position].Value))
+               {
+                fig.tokens.Add((token)variablesGlobales.Find(valor => valor.Value == expression[position].Value).Clone());
+                position++;
+               }
+               else
+               {
+                   fig.tokens.Add((token)expression[position].Clone());
+                   position++;
+               }
+               
                if (expression[position].Value == ")")
                {
                while (expression[position].Value == ")")
                {
-    
                     position++;
                }
                }
@@ -473,10 +484,6 @@ namespace ParserGeo
             if(fig.tokens.Count != 0 && fig.tokens[0].Type == TokenTypes.Point && fig.tokens[0].tokens.Count != 0 && fig.tokens[1].tokens.Count != 0)
             {
                 return new FuncionPointsDos(fig.Value ,fig.Type , fig.tokens[0],fig.tokens[1]);
-            }
-            else
-            {
-              return new FuncionPointsDos(fig.Value , fig.Type , (Point)fig.tokens[0] ,(Point)fig.tokens[1]);
             }
             }
             else if (fig.Type ==TokenTypes.Circle)
@@ -524,22 +531,32 @@ namespace ParserGeo
               let.variablesGlobales = let.variablesGlobales.Distinct().ToList();
               let.expression = expression;
               let.position = position ;
-               for (int i = let.position; i < expression.Count; let.position++)
-               {
+              while(let.position < expression.Count - 1)
+              {
                     if (expression[let.position] is Identificador)
                     {
-                       Identificador nodo = (Identificador)expression[let.position];
-                       let.position++;
-                       nodo.tokens.Add(let.ParseExpression());
-                       let.variablesLocales.Add(nodo);
+                        if (expression[let.position + 1].Value != ",")
+                        {
+                         Identificador nodo = (Identificador)expression[let.position];
+                         let.position++;
+                         nodo.tokens.Add(let.ParseExpression());
+                        let.variablesLocales.Add(nodo);
+                        }
+                        else 
+                        {
+                            let.LineSecuence(expression[let.position].Value);
+                        }
                        if (expression[let.position].Value == ";")
                        {
-                        
+                        let.position++;
+                        if (expression[let.position].Value == "in")
+                        {
+                            break;
+                        }
                         continue;
                        }
                     } 
                        if (expression[let.position].Value == "in")break;
-                       
                }
                 if (expression[let.position].Value == "in")
                 {
@@ -587,22 +604,16 @@ namespace ParserGeo
             Root.variablesLocales.Add(iden);
             
     }
-    public Geometrico Identicadores ()
+    public token Identificadores ()
     {
-           Geometrico nodo = new Geometrico(expression[position - 2].Value , TokenTypes.Identifier , this);
-           nodo.expression = expression;
-           nodo.position = position;
-           if (this.variablesLocales != null)nodo.variablesGlobales.AddRange(nodo.Root.variablesLocales.Select(x => x));
-           if(this.variablesGlobales != null)nodo.variablesGlobales.AddRange(this.variablesGlobales.Select(x => x));
-           nodo.variablesGlobales = nodo.variablesGlobales.Distinct().ToList();
-           nodo.tokens.Add(nodo.ParseExpression());
+           token nodo = new Identificador(expression[position - 1].Value , TokenTypes.Identifier );
+           nodo.tokens.Add(ParseExpression());
            return nodo ;
     }
    public  bool Isfunction(string c) 
    {
         return c == "sin" || c == "cos" || c == "tan" || c == "sqrt"  || c == "^";
   }
-
  public  bool IsOperator(string c)
     {
         return c == "+" || c == "-" || c == "*" || c == "/" || c == "%";
@@ -628,20 +639,36 @@ namespace ParserGeo
     if (TipoSecuencia(NombreSecuencia))
     {
         secuencia.Value = NombreSecuencia;
+        position++;
         while (expression[position].Value != ")")
         {
-            if (expression[position].Value == "(") parentesis++;
-            if (expression[position].Value == ",")position++;
-             secuencia.tokens.Add(ParseTerm());
-             while(expression[position].Value != ")")
-             {
-                parentesis--;
+            if (expression[position].Value == "(") 
+            {
+                parentesis++;
                 position++;
-                if (expression[position].Value == ";")
-                {
-                    break;
-                }
-             }
+            }
+            
+        if (variablesLocales.Any(valor => valor.Value == expression[position].Value ) && expression[position].Value != ")")
+        {
+            secuencia.tokens.Add((token)variablesLocales.Find(valor => valor.Value == expression[position].Value).Clone());
+            position++;
+        }
+        else if (variablesGlobales.Any(valor => valor.Value == expression[position].Value ) && expression[position].Value != ")")
+        {
+             secuencia.tokens.Add((token)variablesGlobales.Find(valor => valor.Value == expression[position].Value).Clone());
+             position++;
+        }
+        else
+        {
+            if(expression[position].Value != ")") secuencia.tokens.Add((token)expression[position].Clone());
+             position++;
+        }
+         if (expression[position].Value == ",")position++;
+         if (expression[position].Value == ")")position++;
+        if (expression[position].Value == ";")
+        {
+         break;
+        }
              if (position > expression.Count - 1 || expression[position].Value == ";")
              {
                 if (parentesis!= 0)
@@ -657,6 +684,7 @@ namespace ParserGeo
                 break ;
              }
         }
+         secuencia.tokens[0] = ComandosDIntercepcion(secuencia.tokens[0].Value , secuencia.tokens[0].tokens[0] , secuencia.tokens[0].tokens[1]);
          return secuencia;
         
     }
@@ -667,7 +695,7 @@ namespace ParserGeo
     }
       if (expression[position].Type == TokenTypes.Identifier)
     {
-        secuencia.Value = expression[position].Value;
+        //secuencia.Value = expression[position].Value;
             
         while (expression[position].Value  != "=")
         {
@@ -681,7 +709,7 @@ namespace ParserGeo
             {
                 break;
             }
-           
+
         }
          if (expression[position].Value != "=")
         {
@@ -691,39 +719,75 @@ namespace ParserGeo
          position++;
        if (expression[position].Value == "{")
         {
-            corchetes++;
             while (expression[position].Value != "}")
             {
                 secuencia.tokens.Add(ParseTerm());
-                if (position > expression.Count - 1)
+                if (expression[position].Value == ";")
                 {
-                    errores.Add(new Errors(ErrorCode.Semantic , "se esperaba un corchete de cierre y un ; en la secuencia "));
-                }
-                else if (expression[position].Value == ";" && corchetes> 0)
-                {
-                    errores.Add(new Errors(ErrorCode.Semantic , "se esperaba un corchete de cierre en la secuencia"));
-                    return secuencia;
-                }
-                if (expression[position].Value == ";" && corchetes <0)
-                {
-                    
-                   errores.Add(new Errors(ErrorCode.Semantic , "se esperaba un corchete de cierre en la secuencia"));
-                   return secuencia;
+                    break;
                 }
             }
+            
         }
         else if(TipoSecuencia(expression[position].Value) || expression[position].Type == TokenTypes.Identifier)
         {
             secuencia.tokens.Add(ParseTerm());
         }
+        
+        if (secuencia.tokens.Count == 1 && secuencia.tokens[0].Type == TokenTypes.Operator )
+        {
+        secuencia.tokens[0] = CalculoSecuencia(secuencia.tokens[0].tokens[0] , secuencia.tokens[0].tokens[1]);
+        }
+        if (secuencia.tokens.Count ==  1 && TipoSecuencia(secuencia.tokens[0].Value))
+        {
+            secuencia.tokens[0] = ComandosDIntercepcion(secuencia.tokens[0].Value , secuencia.tokens[0].tokens[0] , secuencia.tokens[0].tokens[1]);
+        }
+        if(secuencia.secuencias.Count > 1)
+        {
+        for (int i = 0; i < secuencia.secuencias.Count; i++)
+        {
+          if(i < secuencia.tokens[0].tokens.Count )
+           {   
+            if( secuencia.secuencias[0].Value == "_" && secuencia.secuencias.Count == 2 && tokens[0].tokens.Count < secuencia.secuencias.Count)
+            {
+                 secuencia.secuencias[i] = new Underfine("vacio" , TokenTypes.Underfine);
+                 variablesLocales.Add(secuencia.secuencias[i]);
+            }
+            else if (secuencia.secuencias[i].Value == "rest")
+            {
+                 secuencia.secuencias[i].tokens = secuencia.tokens[0].tokens.GetRange(i ,secuencia.tokens[0].tokens.Count - 1);
+                 variablesLocales.Add(secuencia.secuencias[i]);
+            }
+            else if(secuencia.secuencias[i].Value != "_")
+            {
+                 secuencia.secuencias[i].tokens.Add(secuencia.tokens[0].tokens[i]);
+                 variablesLocales.Add(secuencia.secuencias[i]);
+            }
+            }
+              else if (secuencia.tokens[0].tokens.Count == 1 &&secuencia.secuencias.Count > 2 && i == secuencia.secuencias.Count - 2 && secuencia.secuencias[secuencia.secuencias.Count - 1].Value == "_")
+            {
+                 secuencia.secuencias[i] = new Underfine("vacio" , TokenTypes.Underfine);
+                 variablesLocales.Add(secuencia.secuencias[i]);
+            }
+            else if (secuencia.secuencias[i].Value != "_")
+            {
+                variablesLocales.Add(secuencia.secuencias[i]);
+            }
+        }
+      }
+      else
+      {
+        secuencia.Value = secuencia.secuencias[0].Value;
+        secuencia.tokens = secuencia.tokens[0].tokens;
+        variablesLocales.Add(secuencia);
+      }
     }
-    return secuencia;
-  
+    
+  return secuencia;
 }
   public bool LineSecuenceTipo ()
   {
-    return ((expression[position].Type == TokenTypes.Identifier && variablesLocales.Any(valor => valor.Value == expression[position].Value) == false && variablesGlobales.Any(valor => valor.Value == expression[position].Value) == false) ||  expression[position + 2].Value == "{") || TipoSecuencia(expression[position].Value) || expression[position].Value == "point sequence" || expression[position].Value  == "line sequence";
-    
+    return ((expression[position].Type == TokenTypes.Identifier && variablesLocales.Any(valor => valor.Value == expression[position].Value) == false && variablesGlobales.Any(valor => valor.Value == expression[position].Value) == false) || position + 2 < expression.Count - 1 &&  expression[position + 2].Value == "{") || TipoSecuencia(expression[position].Value) || expression[position].Value == "point sequence" || expression[position].Value  == "line sequence";
   }
   public Geometrico DrawFunction()
   {
@@ -810,25 +874,28 @@ namespace ParserGeo
     token secuencia = new token("contenedor" , TokenTypes.secuencia);
     List<token> componentes = new List<token>();
     int posibleVacio = 35;
+    int corchetes = 1;
     while (expression[position].Value != "}")
     {
         if (variablesLocales.Any(valor => valor.Value == expression[position].Value ))
         {
             componentes.Add((token)variablesLocales.Find(valor => valor.Value == expression[position].Value).Clone());
-            position++;
+            
         }
         else if (variablesGlobales.Any(valor => valor.Value == expression[position].Value ))
         {
              componentes.Add((token)variablesGlobales.Find(valor => valor.Value == expression[position].Value).Clone());
-             position++;
+             
         }
         else
         {
-             if (expression[position].Value != "}")componentes.Add((token)expression[position].Clone());
-             position++;
+         if (expression[position].Value != "}")componentes.Add((token)expression[position].Clone());
+             
         }
         posibleVacio--;
+        position++;
         if (expression[position].Value == ",")position++;
+        if (expression[position].Value == "}")corchetes--;
         if(expression[position].Value == "}")
         {
             break ;
@@ -842,10 +909,74 @@ namespace ParserGeo
         {
             return new Underfine("infinito" , TokenTypes.Underfine);
         }
+             if (position > expression.Count - 1)
+                {
+                    errores.Add(new Errors(ErrorCode.Semantic , "se esperaba un corchete de cierre y un ; en la secuencia "));
+                }
+                else if (expression[position].Value == ";" && corchetes> 0)
+                {
+                    errores.Add(new Errors(ErrorCode.Semantic , "se esperaba un corchete de cierre en la secuencia"));
+                    return secuencia;
+                }
+                if (expression[position].Value == ";" && corchetes <0)
+                {
+                   errores.Add(new Errors(ErrorCode.Semantic , "se esperaba un corchete de cierre en la secuencia"));
+                   return secuencia;
+                }
     }
     if(expression[position].Value != ";")position++;
     secuencia.tokens = componentes;
     return secuencia;
   }
+
+  private token CalculoSecuencia(token secuencia1 , token secuencia2)
+    {
+      if (secuencia1.tokens[0] is Underfine || secuencia2.tokens[0] is Underfine || secuencia2.tokens.Count > 25)
+      {
+        return secuencia1;
+      }
+      if (secuencia1.Value == "+" )
+      {
+        secuencia1 = CalculoSecuencia(secuencia1.tokens[0] , secuencia1.tokens[1]);
+      }
+      else
+      {
+       foreach (var item in secuencia2.tokens)
+      {
+        if (!secuencia1.tokens.Any(obj => obj.Value == item.Value ))
+        {
+          secuencia1.tokens.Add(item);
+        }
+      }
+      }
+      return secuencia1;
+    }
+    private  token ComandosDIntercepcion(string nombre , token a , token b)
+    {
+        token secuencial = new token("secuencia" , TokenTypes.secuencia);
+        if(nombre == "intersect")
+        {
+            IEnumerable<token> tokensA = a.tokens;
+            IEnumerable<token> tokensB = b.tokens;
+            List<token> evaluados = (List<token>)tokensA.Intersect(tokensB);
+            secuencial.tokens= evaluados ;
+            return secuencial;
+        }
+        else 
+        {
+            List <token> evaluados = (List<token>)randoms();
+            secuencial.tokens = evaluados;
+            return secuencial;
+        }
+       
+    }
+     private IEnumerable<int> randoms()
+    {
+      Random ran = new Random();
+      for (int i = 0; i < 21; i++)
+      {
+        yield return ran.Next(1, 101);
+      }
+    }
 }
 }

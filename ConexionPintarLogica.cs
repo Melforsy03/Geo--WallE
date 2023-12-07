@@ -9,7 +9,7 @@ namespace ConexionPinturaLogica
     public static void Main()
     {
     //string input = ""
-    List<token> m = Tokenizar.TokenizeString("sequence , melani  = {p1 , p2 , p3} + {undefined} + {p4 , p5} ;");
+    List<token> m = Tokenizar.TokenizeString("mediatriz (p1 , p2) = ");
     for (int i = 0; i < m.Count; i++)
     {
         Console.WriteLine(m[i].Value + " - "+ m[i].Type);
