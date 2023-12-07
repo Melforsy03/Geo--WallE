@@ -3,7 +3,7 @@ using Lexer;
 using ParserGeo;
 public enum Color { black, red, blue, green }
 
-public class Point : Geometrico
+public class Point : token
 {
     public int x;
     public int y;
@@ -11,15 +11,16 @@ public class Point : Geometrico
     token coordenada_x {get ; set ;}
     token coordenada_y {get ; set ;}
 
-    public Point(string Value, TokenTypes Type , Geometrico root) : base(Value, Type , root)
+    public Point(string Value, TokenTypes Type ) : base(Value, Type )
     {
         coordenada_x = null;
         coordenada_y = null;
-        Random random = new Random();
-        x = random.Next();
-        y = random.Next();
+        Random random = new Random(100);
+        x = random.Next(0 , 100);
+        Thread.Sleep(100);
+        y = random.Next(0 , 100);
     }
-    public Point(string Value, TokenTypes Type, token coordenada_x, token coordenada_y , Geometrico root) : base(Value, Type , root)
+    public Point(string Value, TokenTypes Type, token coordenada_x, token coordenada_y) : base(Value, Type )
     {
         this.coordenada_x = coordenada_x;
         this.coordenada_y = coordenada_y;
@@ -55,9 +56,8 @@ public class Line : FuncionPointsDos
 {
     public Line(string Value, TokenTypes Type) : base(Value, Type) { }
 
-    public Line(string Value, TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2)
-    {
-    }
+    public Line(string Value, TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2){}
+
 }
 public class Segment : FuncionPointsDos
 {

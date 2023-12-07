@@ -138,8 +138,8 @@ namespace TokensGeo
   }
   public class FuncionPointsDos : token
   {
-    public Point p1 = new Point("punto1" , TokenTypes.Point , null);
-    public Point p2 = new Point ("punto2", TokenTypes.Point, null);
+    public Point p1 = new Point("punto1" , TokenTypes.Point );
+    public Point p2 = new Point ("punto2", TokenTypes.Point);
     public string Value ;
 
     public GeoType GeoType ;
@@ -151,7 +151,7 @@ namespace TokensGeo
     }
     public FuncionPointsDos(string Value, TokenTypes Type) : base(Value, Type)
     {
-      Random random = new Random(1000);
+      Random random = new Random(100);
       p1!.x = random.Next(1,100);
       Thread.Sleep(100);
       p1.y = random.Next(1,100); 
@@ -271,14 +271,14 @@ namespace TokensGeo
   }
    public class Arco : Geometrico 
       {
-        Point p1 ;
-        Point p2 ;
-        Point p3 ;
-        token medida ;
+        Point p1 = new Point("punto1" , TokenTypes.Point ) ;
+        Point p2 = new Point ("punto2", TokenTypes.Point);
+        Point p3 = new Point ("punto3", TokenTypes.Point);
+        token medida = new Measure("medida", TokenTypes.measure);
          public GeoType GeoTyper {get ; set ;}
         public Arco (string Value , TokenTypes Type , Geometrico root ) : base (Value , Type , root)
         {
-          Random random = new Random(1000);
+        Random random = new Random(100);
          p1!.x = random.Next(1,100);
          Thread.Sleep(100);
          p1.y = random.Next(1,100); 
@@ -322,14 +322,14 @@ namespace TokensGeo
     }
     public class Circunferencia : Geometrico
       {
-        Point p1 = new Point("punto", TokenTypes.Point , null);
+        Point p1 = new Point("punto", TokenTypes.Point );
 
         token medida = new Measure("medida", TokenTypes.measure);
         
         public Circunferencia (string Value , TokenTypes Type , Geometrico root ) :base (Value ,Type , root)
         {
           
-          Random random = new Random(1000);
+          Random random = new Random(100);
           p1!.x = random.Next(1,100);
           Thread.Sleep(100);
           p1.y = random.Next(1,100); 
@@ -500,21 +500,20 @@ namespace TokensGeo
       return numero;
     }
   }
-  public class TokenSecuencia : Geometrico
+  public class TokenSecuencia :token
   {
-   
     public GeoType geoType { get; set; }
-
-    public TokenSecuencia(string Value, TokenTypes type, Geometrico root) : base(Value, type,root )
+    public List<token> secuencias{get ; set ;}
+    public TokenSecuencia(string Value, TokenTypes type) : base(Value, type )
     {
-    
+       secuencias = new List<token>();
     }
     public void Evaluate()
     {
-      for (int i = 0; i < variablesLocales.Count; i++)
+      for (int i = 0; i < secuencias.Count; i++)
       {
-        if(i < tokens.Count - 1)variablesLocales[i].tokens.Add(tokens[i]);
-        else {variablesLocales[i].tokens.Add(new Underfine("Underfine" , TokenTypes.Underfine));}
+        if(i < tokens.Count - 1)secuencias[i].tokens.Add(tokens[i]);
+        else {secuencias[i].tokens.Add(new Underfine("Underfine" , TokenTypes.Underfine));}
       }
     }
     public bool CheckSemantic(List<Errors> errores)
@@ -549,7 +548,7 @@ namespace TokensGeo
 
       for (int i = 0; i < a.Length; i++)
       {
-        a[i] = new Point("p" + i, TokenTypes.Point , null);
+        a[i] = new Point("p" + i, TokenTypes.Point );
       }
       for (int i = 0; i < a.Length; i++)
       {

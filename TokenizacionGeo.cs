@@ -101,6 +101,13 @@ namespace Lexer
                      i = j;
                      break;
                     }
+                    else if (currentToken == "undefined") 
+                    {
+                        tokens.Add(new Underfine("undefined", TokenTypes.Underfine));
+                        currentToken ="";
+                        i = j;
+                        break;
+                    }
                     else if(IsKeyword(currentToken))
                     {
                      tokens.Add(new token (currentToken , TokenTypes.Keyword));
