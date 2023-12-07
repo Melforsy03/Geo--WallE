@@ -664,12 +664,24 @@ namespace ParserGeo
     {
         secuencia.Value = NombreSecuencia;
         position++;
-        if (expression[position].Value != "=" )
+        while (expression[position].Value  != ",")
+        {
+            secuencia.tokens.Add((token)expression[position].Clone());
+            if (expression[position].Value == "=" || expression[position].Value == ";")
+            {
+                break;
+            }
+            if (expression[position].Value == ",")
+            {
+                position++;
+            }
+        }
+         if (expression[position].Value != "=")
         {
             errores.Add(new Errors(ErrorCode.Semantic , "esperabamos un ="));
             return secuencia;
         }
-        position++;
+         position++;
        if (expression[position].Value == "{")
         {
             corchetes++;
