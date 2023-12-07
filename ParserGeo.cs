@@ -660,9 +660,14 @@ namespace ParserGeo
          return secuencia;
         
     }
-     else if (expression[position].Type == TokenTypes.Identifier)
+    else if (NombreSecuencia == "point sequence" || NombreSecuencia == "line sequence")
     {
-        secuencia.Value = NombreSecuencia;
+        position++;
+        secuencia.Type = ValorNombreFigura(NombreSecuencia);
+    }
+      if (expression[position].Type == TokenTypes.Identifier)
+    {
+        secuencia.Value = expression[position].Value;
         position++;
         while (expression[position].Value  != ",")
         {
@@ -716,7 +721,7 @@ namespace ParserGeo
 }
   public bool LineSecuenceTipo ()
   {
-    return ((expression[position].Type == TokenTypes.Identifier && variablesLocales.Any(valor => valor.Value == expression[position].Value) == false && variablesGlobales.Any(valor => valor.Value == expression[position].Value) == false) ||  expression[position + 2].Value == "{") || TipoSecuencia(expression[position].Value);
+    return ((expression[position].Type == TokenTypes.Identifier && variablesLocales.Any(valor => valor.Value == expression[position].Value) == false && variablesGlobales.Any(valor => valor.Value == expression[position].Value) == false) ||  expression[position + 2].Value == "{") || TipoSecuencia(expression[position].Value) || expression[position].Value == "point sequence" || expression[position].Value  == "line sequence";
     
   }
   public Geometrico DrawFunction()
@@ -788,6 +793,14 @@ namespace ParserGeo
     if(c == "measure")
     {
         return TokenTypes.measure;
+    }
+    if(c == "point sequence")
+    {
+        return TokenTypes.point_sequence;
+    }
+    if (c == "line sequence")
+    {
+        return TokenTypes.line_sequence;
     }
     return TokenTypes.Point;
   }
