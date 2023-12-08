@@ -11,6 +11,7 @@ public class Point : token
     token coordenada_x {get ; set ;}
     token coordenada_y {get ; set ;}
 
+
     public Point(string Value, TokenTypes Type ) : base(Value, Type )
     {
         coordenada_x = null;
@@ -56,20 +57,58 @@ public class Line : FuncionPointsDos
 {
     public Line(string Value, TokenTypes Type) : base(Value, Type) { }
 
-    public Line(string Value, TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2){}
-
+    public Line(string Value, TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2)
+    {
+        puntosFigura = Puntos_Recta((Point)point1 ,(Point)point2);
+        puntosFigura.Add((Point)point1);
+        puntosFigura.Add((Point)point2);
+    }
+     public List<Point> Puntos_Recta(Point p1, Point p2)
+        {
+            List<Point> result = new List<Point>();
+            for (int x = p1.x; x <= p2.x; x++)
+            {
+                int y = ((p2.y - p1.y) / (p2.x - p1.x)) * (x - p1.x) + p1.y;
+                result.Add(new Point("",TokenTypes.Point , new TokenNumero(x.ToString() , TokenTypes.Number),new TokenNumero( y.ToString() , TokenTypes.Number)));
+            }
+            return result;
+        }
 }
 public class Segment : FuncionPointsDos
 {
-    public Segment(string Value, TokenTypes Type) : base(Value, Type) { }
+    public Segment(string Value, TokenTypes Type) : base(Value, Type) 
+    { 
+    }
 
     public Segment(string Value, TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2) { }
 }
 public class Ray : FuncionPointsDos
 {
-    public Ray(string Value, TokenTypes Type) : base(Value, Type) { }
+    public Ray(string Value, TokenTypes Type) : base(Value, Type) 
+    {
+        puntosFigura = Puntos_Rayo(p1 ,p2);
+        puntosFigura.Add(p1);
+        puntosFigura.Add(p2);
+    }   
 
-    public Ray(string Value, TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2) { }
+    public Ray(string Value, TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2) 
+    {
+         puntosFigura = Puntos_Rayo((Point)point1 ,(Point)point2);
+        puntosFigura.Add((Point)point1);
+        puntosFigura.Add((Point)point2);
+     }
+
+       public List<Point> Puntos_Rayo(Point p1, Point p2)
+        {
+            List<Point> result = new List<Point>();
+            double pendiente_m = (p2.y - p1.y) / (p2.x - p1.x);
+            for (int x = p1.x; x <= p2.x; x++)
+            {
+                int y = (int)pendiente_m * (x - p2.x) + p2.y;
+                result.Add(new Point("",TokenTypes.Point ,new TokenNumero(x.ToString(),TokenTypes.Number) , new TokenNumero (y.ToString(), TokenTypes.Number)));
+            }
+            return result;
+        }
 }
 public class Measure : FuncionPointsDos
 {

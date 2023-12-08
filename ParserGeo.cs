@@ -363,15 +363,24 @@ namespace ParserGeo
         Funcion.variablesGlobales = Funcion.variablesGlobales.Distinct().ToList();
         Funcion.position = position;
         Funcion.expression = expression;
-         while (expression[Funcion.position].Value != ")")
+        while (expression[Funcion.position].Value != ")")
         {
-            Funcion.variablesLocales.Add(Funcion.ParseExpression());
-        }
-         Funcion.position ++;
+        if(expression[Funcion.position].Value == ",")Funcion.position++;
+       
+         if (expression[Funcion.position].Value != ")")Funcion.variablesLocales.Add((token)expression[position].Clone());
+        
+        Funcion.position++;
         if (expression[Funcion.position].Value == ";")
         {
             position = Funcion.position;
             return Funcion ;
+        }
+        if(expression[Funcion.position].Value == ")")
+        {
+            Funcion.position++;
+            break;
+        }
+        
         }
         position = Funcion.position;
         // si la funcion sera definida 
@@ -406,12 +415,12 @@ namespace ParserGeo
           {
             if (expression[position + 1].Type == TokenTypes.Identifier)
             {
-            fig = new Circunferencia (expression[position + 1].Value , ValorNombreFigura(nombreFigura) , this);
+            fig = new Circunferencia (expression[position + 1].Value , ValorNombreFigura(nombreFigura) );
              position += 2;
             }
             else
             {
-                fig = new Circunferencia(expression[position].Value,ValorNombreFigura(nombreFigura) , this);
+                fig = new Circunferencia(expression[position].Value,ValorNombreFigura(nombreFigura));
                 position++;
             }
           }
@@ -464,10 +473,10 @@ namespace ParserGeo
                
                if (expression[position].Value == ")")
                {
-               while (expression[position].Value == ")")
-               {
+              
                     position++;
-               }
+                    break;
+               
                }
                if (expression[position].Value == ";")
                {
@@ -481,7 +490,7 @@ namespace ParserGeo
             {
                 return fig;
             }
-            if(fig.tokens.Count != 0 && fig.tokens[0].Type == TokenTypes.Point && fig.tokens[0].tokens.Count != 0 && fig.tokens[1].tokens.Count != 0)
+            if(fig.tokens.Count != 0  )
             {
                 return new FuncionPointsDos(fig.Value ,fig.Type , fig.tokens[0],fig.tokens[1]);
             }
@@ -492,9 +501,10 @@ namespace ParserGeo
                 {
                     return fig;
                 }
-                if(fig.tokens.Count != 0 && fig.tokens[0].Type == TokenTypes.Point && (fig.tokens[1].Type == TokenTypes.measure || fig.tokens[1].Type == TokenTypes.Number || fig.tokens[1].Type == TokenTypes.Operator) && fig.tokens[0].tokens.Count != 0 )
+                if(fig.tokens.Count != 0  )
                 {
-                    return new Circunferencia(fig.Value , fig.Type , this ,(Point)fig.tokens[0] ,fig.tokens[1]);
+                    
+                    return new Circunferencia(fig.Value , fig.Type , this , fig.tokens[0] ,fig.tokens[1]);
                 }
             }
             else if(fig.Type == TokenTypes.Point)
@@ -542,10 +552,12 @@ namespace ParserGeo
                          nodo.tokens.Add(let.ParseExpression());
                         let.variablesLocales.Add(nodo);
                         }
-                        else 
+                        else
                         {
                             let.LineSecuence(expression[let.position].Value);
                         }
+                    }
+                   
                        if (expression[let.position].Value == ";")
                        {
                         let.position++;
@@ -554,8 +566,10 @@ namespace ParserGeo
                             break;
                         }
                         continue;
-                       }
+                       
                     } 
+                    if (expression[let.position].Value == ")") let.position++;
+                    
                        if (expression[let.position].Value == "in")break;
                }
                 if (expression[let.position].Value == "in")
@@ -652,16 +666,37 @@ namespace ParserGeo
         {
             secuencia.tokens.Add((token)variablesLocales.Find(valor => valor.Value == expression[position].Value).Clone());
             position++;
+            if (expression[position].Value == "(")
+            {
+            while (expression[position].Value != ")")
+            {
+                position++;
+                if (expression[position].Value == "," && secuencia.tokens[secuencia.tokens.Count- 1].Type != TokenTypes.Funcion)
+                {
+                    break;
+                }
+            }
+            }
         }
         else if (variablesGlobales.Any(valor => valor.Value == expression[position].Value ) && expression[position].Value != ")")
         {
              secuencia.tokens.Add((token)variablesGlobales.Find(valor => valor.Value == expression[position].Value).Clone());
              position++;
+            if (expression[position].Value == "(")
+            {
+             while (expression[position].Value != ")" )
+            {
+                if (expression[position].Value == "," && secuencia.tokens[secuencia.tokens.Count- 1].Type != TokenTypes.Funcion)
+                {
+                    break;
+                }
+                position++;
+            }
+            }
         }
         else
         {
-            if(expression[position].Value != ")") secuencia.tokens.Add((token)expression[position].Clone());
-             position++;
+            if(expression[position].Value != ")") secuencia.tokens.Add(ParseTerm());
         }
          if (expression[position].Value == ",")position++;
          if (expression[position].Value == ")")position++;
@@ -683,8 +718,8 @@ namespace ParserGeo
                 }
                 break ;
              }
+             secuencia.tokens[0] = ComandosDIntercepcion (NombreSecuencia ,(Figura)secuencia.tokens[0].tokens[0] , (Figura)secuencia.tokens[0].tokens[1]);
         }
-         secuencia.tokens[0] = ComandosDIntercepcion(secuencia.tokens[0].Value , secuencia.tokens[0].tokens[0] , secuencia.tokens[0].tokens[1]);
          return secuencia;
         
     }
@@ -737,10 +772,6 @@ namespace ParserGeo
         if (secuencia.tokens.Count == 1 && secuencia.tokens[0].Type == TokenTypes.Operator )
         {
         secuencia.tokens[0] = CalculoSecuencia(secuencia.tokens[0].tokens[0] , secuencia.tokens[0].tokens[1]);
-        }
-        if (secuencia.tokens.Count ==  1 && TipoSecuencia(secuencia.tokens[0].Value))
-        {
-            secuencia.tokens[0] = ComandosDIntercepcion(secuencia.tokens[0].Value , secuencia.tokens[0].tokens[0] , secuencia.tokens[0].tokens[1]);
         }
         if(secuencia.secuencias.Count > 1)
         {
@@ -928,7 +959,6 @@ namespace ParserGeo
     secuencia.tokens = componentes;
     return secuencia;
   }
-
   private token CalculoSecuencia(token secuencia1 , token secuencia2)
     {
       if (secuencia1.tokens[0] is Underfine || secuencia2.tokens[0] is Underfine || secuencia2.tokens.Count > 25)
@@ -951,15 +981,32 @@ namespace ParserGeo
       }
       return secuencia1;
     }
-    private  token ComandosDIntercepcion(string nombre , token a , token b)
+    private  token ComandosDIntercepcion(string nombre , Figura a , Figura b)
     {
-        token secuencial = new token("secuencia" , TokenTypes.secuencia);
+         IEnumerable<Point> tokensA = new List<Point>();
+        IEnumerable<Point> tokensB = new List<Point>();
+        Figura secuencial = new Figura("secuencia" , TokenTypes.secuencia);
         if(nombre == "intersect")
         {
-            IEnumerable<token> tokensA = a.tokens;
-            IEnumerable<token> tokensB = b.tokens;
-            List<token> evaluados = (List<token>)tokensA.Intersect(tokensB);
-            secuencial.tokens= evaluados ;
+            if(a.Type == TokenTypes.Identifier)
+            {
+                   tokensA = (List<Point>)((Figura)a.tokens[0]).puntosFigura;
+            }
+            else
+            {
+                tokensA = (List<Point>)a.puntosFigura;
+            }
+             if(b.Type == TokenTypes.Identifier)
+            {
+                   tokensB = (List<Point>)((Figura)b.tokens[0]).puntosFigura;;
+            }
+            else
+            {
+                tokensB = (List<Point>)b.puntosFigura;
+            }
+            
+            List<Point> evaluados = tokensA.Intersect(tokensB).ToList();
+            secuencial.puntosFigura = evaluados;
             return secuencial;
         }
         else 
@@ -978,5 +1025,59 @@ namespace ParserGeo
         yield return ran.Next(1, 101);
       }
     }
+    private token CumpleCondicion(Figura A , Figura B)
+    {
+        Figura valor = new Figura("",TokenTypes.secuencia);
+        List<Point>interseccion = new List<Point>();
+        int limite = 2;
+        for (int J = ((FuncionPointsDos)A).p1.x ; J < ((FuncionPointsDos)A).p2.x ; J++)
+        {
+            if (A is FuncionPointsDos && B is FuncionPointsDos)
+            {
+                int valor1 =((((FuncionPointsDos)A).p2.y -  ((FuncionPointsDos)A).p1.y) / ( ((FuncionPointsDos)A).p2.x -  ((FuncionPointsDos)A).p1.x)) * (J -  ((FuncionPointsDos)A).p1.x) +  ((FuncionPointsDos)A).p1.y;
+                int valor2 =  ((((FuncionPointsDos)B).p2.y -  ((FuncionPointsDos)B).p1.y) / ( ((FuncionPointsDos)B).p2.x -  ((FuncionPointsDos)B).p1.x)) * (J -  ((FuncionPointsDos)B).p1.x) +  ((FuncionPointsDos)B).p1.y;
+                if(limite > 0 && valor1 == valor2)
+                {
+                    Point punto = new Point("", TokenTypes.Point);
+                    punto.x = J;
+                    punto.y = valor1;
+                    interseccion.Add(punto);
+                    limite --;
+                }
+                else
+                {
+                    return new Underfine("infinito" , TokenTypes.Underfine);
+                }
+            }
+            if (A is FuncionPointsDos || B is Arco)
+            {   
+            
+                 double d = Math.Sqrt(Math.Pow(((Arco)B).p3.x - ((Arco)B).p2.x, 2) + Math.Pow(((Arco)B).p3.y - ((Arco)B).p2.y, 2));
+                 double angulo = 2 * Math.Asin(d / 2 * int.Parse(((Arco)B).medida.Value));
+                 double angulo1 = angulo / (30 - 1);
+                 int x1 = ((Arco)A).p1.x + int.Parse(((Arco)A).medida.Value) * (int)Math.Cos(angulo1 / 2 + J * angulo);
+                 int y = ((Arco)A).p1.x + int.Parse(((Arco)A).medida.Value) * (int)Math.Sin(angulo1 / 2 + J * angulo);
+                 int valor2 =  ((((FuncionPointsDos)A).p2.y -  ((FuncionPointsDos)A).p1.y) / ( ((FuncionPointsDos)A).p2.x -  ((FuncionPointsDos)A).p1.x)) * (J -  ((FuncionPointsDos)A).p1.x) +  ((FuncionPointsDos)A).p1.y;  
+                 int valor1 =  ((x1 - y) / (x1 - y)) * (J - y) + y;  
+                 if (limite > 0 && valor1 == valor2)
+                 {
+                    Point punto = new Point("", TokenTypes.Point);
+                    punto.x = J;
+                    punto.y = valor1;
+                    interseccion.Add(punto);
+                    limite --;
+                 }
+                 else
+                 {
+                    return new Underfine("infinito" , TokenTypes.Underfine);
+                 }           
+            }
+            
+        }
+        valor.puntosFigura = interseccion;
+        return valor;
+    }
+
+   
 }
 }
