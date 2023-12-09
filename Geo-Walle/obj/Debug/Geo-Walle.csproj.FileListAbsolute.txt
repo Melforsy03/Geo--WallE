@@ -1,0 +1,12 @@
+C:\Users\Livi3\Desktop\Visual Geo-Walle\Geo-Walle\Geo-Walle\bin\Debug\Geo-Walle.exe.config
+C:\Users\Livi3\Desktop\Visual Geo-Walle\Geo-Walle\Geo-Walle\bin\Debug\Geo-Walle.exe
+C:\Users\Livi3\Desktop\Visual Geo-Walle\Geo-Walle\Geo-Walle\bin\Debug\Geo-Walle.pdb
+C:\Users\Livi3\Desktop\Visual Geo-Walle\Geo-Walle\Geo-Walle\obj\Debug\Geo-Walle.csproj.AssemblyReference.cache
+C:\Users\Livi3\Desktop\Visual Geo-Walle\Geo-Walle\Geo-Walle\obj\Debug\Geo-Walle.csproj.SuggestedBindingRedirects.cache
+C:\Users\Livi3\Desktop\Visual Geo-Walle\Geo-Walle\Geo-Walle\obj\Debug\Geo_Walle.GeoW.resources
+C:\Users\Livi3\Desktop\Visual Geo-Walle\Geo-Walle\Geo-Walle\obj\Debug\Geo_Walle.Inicio.resources
+C:\Users\Livi3\Desktop\Visual Geo-Walle\Geo-Walle\Geo-Walle\obj\Debug\Geo_Walle.Properties.Resources.resources
+C:\Users\Livi3\Desktop\Visual Geo-Walle\Geo-Walle\Geo-Walle\obj\Debug\Geo-Walle.csproj.GenerateResource.cache
+C:\Users\Livi3\Desktop\Visual Geo-Walle\Geo-Walle\Geo-Walle\obj\Debug\Geo-Walle.csproj.CoreCompileInputs.cache
+C:\Users\Livi3\Desktop\Visual Geo-Walle\Geo-Walle\Geo-Walle\obj\Debug\Geo-Walle.exe
+C:\Users\Livi3\Desktop\Visual Geo-Walle\Geo-Walle\Geo-Walle\obj\Debug\Geo-Walle.pdb

@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B5FCD466-D4B0-4CE2-84C0-D1F57C890A80}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Geo_Walle</RootNamespace>
+    <AssemblyName>Geo-Walle</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Word.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ArcBase.cs" />
+    <Compile Include="ArcBase1.cs" />
+    <Compile Include="Fig.cs" />
+    <Compile Include="GeoW.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GeoW.Designer.cs">
+      <DependentUpon>GeoW.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Inicio.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Inicio.Designer.cs">
+      <DependentUpon>Inicio.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Logica\Interseccion.cs" />
+    <Compile Include="Logica\Error.cs" />
+    <Compile Include="Logica\FuncionesGeo.cs" />
+    <Compile Include="Logica\GeoType.cs" />
+    <Compile Include="Logica\PaitingFig.cs" />
+    <Compile Include="Logica\ConexionPintarLogica.cs" />
+    <Compile Include="Logica\TokensGeo.cs" />
+    <Compile Include="Logica\TokenizacionGeo.cs" />
+    <Compile Include="Logica\ParserGeo.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="GeoW.resx">
+      <DependentUpon>GeoW.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inicio.resx">
+      <DependentUpon>Inicio.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Informe.txt" />
+    <None Include="Resources\Word.png" />
+    <None Include="Resources\Instrucciones.txt" />
+    <None Include="Resources\IMG-20231203-WA0038.jpg" />
+    <None Include="Resources\IMG-20231203-WA0042.jpg" />
+    <None Include="Resources\IMG-20231203-WA0041.jpg" />
+    <None Include="Resources\IMG-20231203-WA0040.jpg" />
+    <None Include="Resources\IMG-20231203-WA0039.jpg" />
+    <None Include="Resources\-5147733748861742228_120.jpg" />
+    <None Include="Resources\-5147871866420046993_120.jpg" />
+    <None Include="Resources\-5147733748861742227_120.jpg" />
+    <None Include="Resources\-5147733748861742229_120.jpg" />
+    <None Include="Resources\photo_2023-12-04_12-31-25.jpg" />
+    <None Include="Resources\photo_2023-12-04_12-31-43.jpg" />
+    <None Include="Resources\photo_2023-12-04_12-31-06.jpg" />
+    <Content Include="Word.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
