@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Geo_Walle.Logica
 {
-    internal class Interseccion
+    public class Interseccion
     {
         public List<Point> Puntos_Recta(Point p1, Point p2)
         {

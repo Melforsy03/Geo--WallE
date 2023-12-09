@@ -93,7 +93,7 @@ namespace Geo_Walle
             }
 
 
-            btn_reset_Click(sender, e);
+            Btn_reset_Click(sender, e);
             Graphics lienzo = Lienzo.CreateGraphics();
             this.impud = txtBox_codigo.Text;
 
@@ -235,12 +235,8 @@ namespace Geo_Walle
 
             return alpha;
         }
-        //public object txtBox_codigo_TextChanged(object sender, EventArgs e)
-        //{
-        //    return this.impud = txtBox_codigo.Text;
-        //}
 
-        private void btn_reset_Click(object sender, EventArgs e)
+        private void Btn_reset_Click(object sender, EventArgs e)
         {
             Graphics lienzo = Lienzo.CreateGraphics();
             Figuras_Dibujadas = new List<Figuras>();
