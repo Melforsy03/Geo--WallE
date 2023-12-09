@@ -10,44 +10,40 @@ namespace ParserGeo
 {
     public class Geometrico : token
     {
-        
         //nombre del arbol
-    public  string Value {get ; set ;}
-    //tipo del arbol
-    public  TokenTypes Type {get ; set ;}
-    //variables locales del arbol
-    public  List<token> variablesLocales {get ; set ;}
-    //variables gloables
-    public  List<token> variablesGlobales {get ; set ;}
-    // Nodo padre del arbol
-    public  Geometrico Root {get ; set ;}
-    //lista de tokens a parsear 
-    public  List<token> expression {get ;set ;}
+        public  string Value {get ; set ;}
+        //tipo del arbol
+        public  TokenTypes Type {get ; set ;}
+        //variables locales del arbol
+        public List<token> variablesLocales { get; set; }
+        //variables gloables
+        public  List<token> variablesGlobales { get; set; }
+        // Nodo padre del arbol
+        public  Geometrico Root { get; set; }
+        //lista de tokens a parsear 
+        public  List<token> expression {get ;set ;}
         public List<token> Figuras_para_Pintar { get; set; }
         //posicion con la que se va a recorrer recursivamente
         public int position {get ; set ;}
-    public List<Errors> errores {get ; set ;}
-    // constructor del arbol
-   public Geometrico (string Value , TokenTypes Type , Geometrico Root) : base (Value , Type )
-   {
-      errores= new List<Errors>();
-      this.Value = Value ; 
-      this.Type = Type ;
-      variablesLocales = new List<token>();
-      variablesGlobales = new List<token>();
-      this.Root = Root;
+        public List<Errors> errores {get ; set ;}
+        // constructor del arbol
+        public Geometrico (string Value , TokenTypes Type , Geometrico Root) : base (Value , Type )
+        {
+            errores= new List<Errors>();
+            this.Value = Value ; 
+            this.Type = Type ;
+            variablesLocales = new List<token>();
+            variablesGlobales = new List<token>();
+            this.Root = Root;
             this.Figuras_para_Pintar = new List<token>();
       
-   }
+        }
         // metodo que me evalua el arbol
         public void Evaluate()
         {
             for (int i = 0; i < tokens.Count; i++)
             {
-                if (tokens[i].Evaluar() is Figura)
-                {
-
-                }
+                tokens[i].Evaluar();
             }
         }
         // metodo que me chequea la semantica del arbol
@@ -66,63 +62,63 @@ namespace ParserGeo
         }
         //construccion del arbol
         public  token Parser()
-    {
-       return Expresiones();
-    }
-    public token Expresiones ()
-    {
-          token auxiliar = null;
-          while (position < expression.Count - 1)
-          {
+        {
+            return Expresiones();
+        }
+        public token Expresiones ()
+        {
+            token auxiliar = null;
+            while (position < expression.Count - 1)
+            {
         // la funcion Tipos me devuelve True si es tipo point , segmento , circulo , arco ,line o color
          
-            if ( expression[position].Value == "if" )
-            {
-                position++;
-                // Parsea la condicion if 
-                auxiliar = ParserIFelse();
-                if(auxiliar != null )this.tokens.Add(auxiliar);
-                Expresiones();
-            }
-            else if(expression[position].Value == "let")
-            {
-               position++;
-               //parsea la estructura Let - in
-               auxiliar  = Letin();
-               if(auxiliar != null )this.tokens.Add(auxiliar);
-               Expresiones();
-            }
-            else if(expression[position].Value == "draw")
-            {
-                position++;
-                //parsea la funcioon draw 
-                auxiliar = DrawFunction();
-                this.tokens.Add(auxiliar);
-                
-            }
-            else  
-            {
-                auxiliar = ParseExpression();
-            if (Tipos(auxiliar.Type) || auxiliar.Type == TokenTypes.Funcion || auxiliar.Type == TokenTypes.Identifier)
-            {
-                //agrega el token a las variables locales 
-                this.variablesLocales.Add((token)auxiliar.Clone());
-                position++;
-                
-                Expresiones();
-            }
-              else if(auxiliar != null || auxiliar.Type != TokenTypes.secuencia)
-                {
-                  this.tokens.Add(auxiliar);
-                }
-                if (position < expression.Count - 1 && expression[position].Value == ";")
+                if ( expression[position].Value == "if" )
                 {
                     position++;
+                    // Parsea la condicion if 
+                    auxiliar = ParserIFelse();
+                    if(auxiliar != null )this.tokens.Add(auxiliar);
+                    Expresiones();
                 }
+                else if(expression[position].Value == "let")
+                {
+                    position++;
+                    //parsea la estructura Let - in
+                    auxiliar  = Letin();
+                    if(auxiliar != null )this.tokens.Add(auxiliar);
+                    Expresiones();
+                }
+                else if(expression[position].Value == "draw")
+                {
+                    position++;
+                    //parsea la funcioon draw 
+                    auxiliar = DrawFunction();
+                    this.tokens.Add(auxiliar);
                 
+                }
+                else  
+                {
+                    auxiliar = ParseExpression();
+                    if (Tipos(auxiliar.Type) || auxiliar.Type == TokenTypes.Funcion || auxiliar.Type == TokenTypes.Identifier)
+                    {
+                    //agrega el token a las variables locales 
+                    this.variablesLocales.Add((token)auxiliar.Clone());
+                    position++;
+                
+                    Expresiones();
+                    }
+                    else if(auxiliar != null || auxiliar.Type != TokenTypes.secuencia)
+                    {
+                    this.tokens.Add(auxiliar);
+                    }
+                    if (position < expression.Count - 1 && expression[position].Value == ";")
+                    {
+                    position++;
+                    }
+                
+                }
             }
-          }
-         return Root;
+        return Root;
     }
     //parsea las expresiones 
     private  token ParseExpression()

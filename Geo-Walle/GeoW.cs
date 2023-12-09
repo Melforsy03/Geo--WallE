@@ -19,29 +19,45 @@ namespace Geo_Walle
 {
     public partial class GeoW : Form
     {
+        //Codigo de entrada del usuario.
         string impud;
+        //Figuras que se encuentran dentro de un draw.
         List<token> Figuras_del_Parser;
-        List<string> errores = new List<string>();
-        List<Figuras> Figuras_para_dibujar = new List<Figuras>();
-        List<Circulo> Circulos_para_dibujar = new List<Circulo>();
-        List<Arco> Arcos_para_dibujar = new List<Arco>();
+        //errores del evaluador que debo imprimir en la pantalla.
+        List<Errors> errores;
+        // dividi la lista de figuras en tres segun el tipo de figura que era cada objeto
+        // Lineas, rayos y segmentos.
+        List<Figuras> Figuras_para_dibujar;
+        //circunferencias
+        List<Circulo> Circulos_para_dibujar;
+        //Arcos
+        List<Arco> Arcos_para_dibujar;
+        // Listas de las figuras que ya estan dibujadas en el lienzo.
         List<Figuras> Figuras_Dibujadas;
         List<PointP> Points_Dibujados;
         List<Circulo> Circulos_Dibujados;
         List<Arco> Arcos_Dibujados;
+        //Pila de los colores q va poniendo el usuario.
         Stack<Color> color = new Stack<Color>();
+        // color actual de la figuras.
         Color Fig_Color;
+
         public GeoW()
         {
             InitializeComponent();
+
+            Figuras_para_dibujar = new List<Figuras>();
+            Circulos_para_dibujar = new List<Circulo>();
+            Arcos_para_dibujar = new List<Arco>();
+
             Figuras_del_Parser = new List<token>();
             Figuras_Dibujadas = new List<Figuras>();
             Points_Dibujados = new List<PointP>();
             Arcos_Dibujados = new List<Arco>();
+            errores = new List<Errors>();
 
-            if (color.Count > 0)
-                Fig_Color = color.Pop();
-            else Fig_Color = Color.Black;
+            if (color.Count <= 0) Fig_Color = Color.Black;
+            else Fig_Color = color.Pop();
         }
 
         private void btn_volver_Click(object sender, EventArgs e)
@@ -53,20 +69,19 @@ namespace Geo_Walle
         {
             try
             {
-                this.impud = txtBox_codigo.Text;
+                impud = txtBox_codigo.Text;
                 List<token> m = Tokenizar.TokenizeString(impud);
                 Geometrico arbol = new Geometrico("", TokenTypes.Identifier, null);
                 arbol.expression = m;
                 arbol.Parser();
-                List<Errors> errors = new List<Errors>();
 
-                if (!arbol.CheckSemantic(errors))
-                {
-                    for (int i = 0; i < errors.Count; i++)
-                        Console.WriteLine(errors[i]);
-                }
-                else
-                    arbol.Evaluate();
+                //if (!arbol.CheckSemantic(errores))
+                //{
+                //    for (int i = 0; i < errores.Count; i++)
+                //        Console.WriteLine(errores[i]);
+                //}
+                //else
+                arbol.Evaluate();
                 Figuras_del_Parser = arbol.Figuras_para_Pintar;
 
                 Transformar(Figuras_del_Parser);
@@ -76,7 +91,7 @@ namespace Geo_Walle
                 Error_Box.Text = ex.Message;
                 MessageBox.Show(ex.Message);
             }
-        
+
 
             btn_reset_Click(sender, e);
             Graphics lienzo = Lienzo.CreateGraphics();
@@ -124,7 +139,7 @@ namespace Geo_Walle
             PaintPoint(point1, esta);
             PaintPoint(point2, esta);
 
-           if (figura == FigTye.segment)
+            if (figura == FigTye.segment)
             {
                 lienzo.DrawLine(new Pen(color), point1.x + 2, point1.y + 2, point2.x + 2, point2.y + 2);
             }
@@ -147,7 +162,7 @@ namespace Geo_Walle
 
                 float interseccionX_izq = 0;
                 float interseccionY_izq = pendiente_m;
-                PointP interseccion_Izq = new PointP("id",(int)interseccionX_izq,(int)interseccionY_izq);
+                PointP interseccion_Izq = new PointP("id", (int)interseccionX_izq, (int)interseccionY_izq);
 
                 float interseccionX_der = this.Width - 1;
                 float interseccionY_der = pendiente_m * interseccionX_der + b;
@@ -163,7 +178,7 @@ namespace Geo_Walle
             Graphics lienzo = Lienzo.CreateGraphics();
             if (!esta)
             {
-                Arcos_Dibujados.Add(new Arco(point1, point2, centro, figura,media));
+                Arcos_Dibujados.Add(new Arco(point1, point2, centro, figura, media));
                 esta = true;
             }
             PaintPoint(point1, esta);
@@ -196,7 +211,7 @@ namespace Geo_Walle
         {
             Graphics lienzo = this.Lienzo.CreateGraphics();
 
-            if(!esta)
+            if (!esta)
                 Points_Dibujados.Add(point);
 
             lienzo.FillEllipse(Brushes.Black, point.x, point.y, 5, 5);
@@ -243,7 +258,7 @@ namespace Geo_Walle
         {
             Limpiar_Lianzo();
             Traslate(0, -10);
-         }
+        }
         private void btn_derecha_Click(object sender, EventArgs e)
         {
             Limpiar_Lianzo();
@@ -290,14 +305,14 @@ namespace Geo_Walle
 
         public void txtBox_codigo_TextChanged(object sender, EventArgs e)
         {
-            
+
         }
 
         private void Transformar(List<token> figuras_del_Parser)
         {
-            for(int i = 0;i< figuras_del_Parser.Count;i++)
+            for (int i = 0; i < figuras_del_Parser.Count; i++)
             {
-                if(figuras_del_Parser[i] is Segment)
+                if (figuras_del_Parser[i] is Segment)
                 {
                     PointP p1 = new PointP("p1", Convert.ToInt32(figuras_del_Parser[i].tokens[0].tokens[0].Value), Convert.ToInt32(figuras_del_Parser[i].tokens[0].tokens[1].Value));
                     PointP p2 = new PointP("p1", Convert.ToInt32(figuras_del_Parser[i].tokens[1].tokens[0].Value), Convert.ToInt32(figuras_del_Parser[i].tokens[1].tokens[1].Value));
@@ -325,7 +340,7 @@ namespace Geo_Walle
                 if (figuras_del_Parser[i] is Arco)
                 {
                     PointP p1 = new PointP("p1", Convert.ToInt32(figuras_del_Parser[i].tokens[0].tokens[0].Value), Convert.ToInt32(figuras_del_Parser[i].tokens[0].tokens[1].Value));
-                    PointP p2 = new PointP("p1", Convert.ToInt32(figuras_del_Parser[i].tokens[1].tokens[0].Value), Convert.ToInt32(figuras_del_Parser[i].tokens[1].tokens[1].Value)); 
+                    PointP p2 = new PointP("p1", Convert.ToInt32(figuras_del_Parser[i].tokens[1].tokens[0].Value), Convert.ToInt32(figuras_del_Parser[i].tokens[1].tokens[1].Value));
                     PointP p3 = new PointP("p1", Convert.ToInt32(figuras_del_Parser[i].tokens[2].tokens[0].Value), Convert.ToInt32(figuras_del_Parser[i].tokens[2].tokens[1].Value));
                     int media = (int)Math.Sqrt(Math.Pow(p2.x - p1.x, 2) + Math.Pow(p2.y - p1.y, 2));
                     Arcos_para_dibujar.Add(new Arco(p1, p2, p3, FigTye.circle, media));
