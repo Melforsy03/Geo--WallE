@@ -5,7 +5,7 @@ namespace ParserGeo
     public class Geometrico : token
     {
         
-        //nombre del arbol
+    //nombre del arbol
     public  string Value {get ; set ;}
     //tipo del arbol
     public  TokenTypes Type {get ; set ;}
@@ -19,6 +19,7 @@ namespace ParserGeo
     public  List<token> expression {get ;set ;} 
     //posicion con la que se va a recorrer recursivamente
     public int position {get ; set ;}
+    public Stack <Color> colors {get ; set ;}
     public List<Errors> errores {get ; set ;}
     // constructor del arbol
    public Geometrico (string Value , TokenTypes Type , Geometrico Root) : base (Value , Type )
@@ -52,8 +53,14 @@ namespace ParserGeo
           while (position < expression.Count - 1)
           {
         // la funcion Tipos me devuelve True si es tipo point , segmento , circulo , arco ,line o color
-         
-            if ( expression[position].Value == "if" )
+            if (TiposFigura(expression[position].Value))
+            {
+                variablesLocales.Add(ParseTerm());
+                if(expression[position].Value == ";")position++;
+                Expresiones();
+
+            }
+            else if ( expression[position].Value == "if" )
             {
                 position++;
                 // Parsea la condicion if 
@@ -451,8 +458,8 @@ namespace ParserGeo
             }
           }
         }
-         if (expression[position].Value == ";")return fig ;
-            while(expression[position].Value != ")")
+        if (expression[position].Value == ";")return fig ;
+        while(expression[position].Value != ")")
             {
                if (expression[position].Value == "(" || expression[position].Value == ","  || expression[position].Value == ")") position++;
                if (variablesLocales.Any (valor => valor.Value == expression[position].Value))
@@ -483,19 +490,26 @@ namespace ParserGeo
                  break;
                }
             }
-           if(expression[position].Value != ";") position++;
-            if (fig.Type != TokenTypes.Circle && fig.Type != TokenTypes.Arc && fig.Type != TokenTypes.Point)
+        if(expression[position].Value != ";") position++;
+        if (fig.Type != TokenTypes.Circle && fig.Type != TokenTypes.Arc && fig.Type != TokenTypes.Point)
             {
             if (fig.tokens.Count == 0)
             {
                 return fig;
             }
-            if(fig.tokens.Count != 0  )
+            if(fig.tokens.Count != 0 )
             {
-                return new FuncionPointsDos(fig.Value ,fig.Type , fig.tokens[0],fig.tokens[1]);
+                if(fig.tokens[0].Type != TokenTypes.Identifier && fig.tokens[0].Type != TokenTypes.Number ||  fig.tokens[1].Type != TokenTypes.Identifier && fig.tokens [1].Type != TokenTypes.Number )
+                {
+                  new ArgumentException ("los parametros pasados al  punto no son validos");
+                }
+                else
+                {
+                   return new FuncionPointsDos(fig.Value ,fig.Type , fig.tokens[0],fig.tokens[1]);
+                }
             }
             }
-            else if (fig.Type ==TokenTypes.Circle)
+        else if (fig.Type ==TokenTypes.Circle)
             {
                 if (fig.tokens.Count == 0)
                 {
@@ -503,11 +517,18 @@ namespace ParserGeo
                 }
                 if(fig.tokens.Count != 0  )
                 {
-                    
+                    if(fig.tokens[0].Type != TokenTypes.Identifier && fig.tokens[0].Type != TokenTypes.Point ||  fig.tokens[1].Type != TokenTypes.Identifier && fig.tokens [1].Type != TokenTypes.Number )
+                    {
+                        new ArgumentException ("los parametros pasados a la circunferencia no son validos");
+
+                    }
+                    else
+                    {
                     return new Circunferencia(fig.Value , fig.Type , this , fig.tokens[0] ,fig.tokens[1]);
+                    }
                 }
             }
-            else if(fig.Type == TokenTypes.Point)
+        else if(fig.Type == TokenTypes.Point)
             {
                 if(fig.tokens.Count == 0 )
                 {
@@ -515,7 +536,14 @@ namespace ParserGeo
                 }
                 if(fig.tokens.Count != 0)
                 {
-                 return new Point (fig.Value , fig.Type , fig.tokens[0] , fig.tokens[1] );
+                    if(fig.tokens[0].Type != TokenTypes.Identifier && fig.tokens[0].Type != TokenTypes.Number ||  fig.tokens[1].Type != TokenTypes.Identifier && fig.tokens [1].Type != TokenTypes.Number )
+                    {
+                        new ArgumentException ("los parametros pasados al  punto no son validos");
+                    }
+                    else
+                    {
+                    return new Point (fig.Value , fig.Type , fig.tokens[0] , fig.tokens[1] );
+                    }
                 }
             }
             else if(fig.Type == TokenTypes.measure)
@@ -526,7 +554,34 @@ namespace ParserGeo
                 }
                 if(fig.tokens.Count != 0)
                 {
-                 return new Measure (fig.Value , fig.Type , fig.tokens[0] , fig.tokens[1] );
+                    if(fig.tokens[0].Type != TokenTypes.Identifier && fig.tokens[0].Type != TokenTypes.Point ||  fig.tokens[1].Type != TokenTypes.Identifier && fig.tokens [1].Type != TokenTypes.Point )
+                    {
+                        new ArgumentException ("los parametros pasados a la medida  no son  validos");
+                        
+                    }
+                    else
+                    {
+                     return new Measure (fig.Value , fig.Type , fig.tokens[0] , fig.tokens[1] );
+                    }
+                    
+                }
+                else if (fig.Type == TokenTypes.Arc)
+                {
+                    if (fig.tokens.Count == 0)
+                    {
+                        return fig ;
+                    }
+                    else
+                    {
+                    if(fig.tokens[0].Type != TokenTypes.Identifier && fig.tokens[0].Type != TokenTypes.Point ||  fig.tokens[1].Type != TokenTypes.Identifier && fig.tokens [1].Type != TokenTypes.Point || fig.tokens[2].Type != TokenTypes.Identifier && fig.tokens[2].Type != TokenTypes.Point || fig.tokens[3].Type != TokenTypes.Identifier && fig.tokens[3].Type != TokenTypes.Number )
+                    {
+                        new ArgumentException ("los parametros pasados al arco no son validos");
+                    }
+                    else
+                    {
+                        return new Arco (fig.Value , fig.Type , tokens[0] , tokens[1] , tokens[2] , tokens[3]);
+                    }
+                    }
                 }
             }
         
@@ -836,7 +891,7 @@ namespace ParserGeo
         
         if (expression[position].Value == ")")
         {
-            while(expression[position].Value != ")" )
+            while(expression[position].Value == ")" )
         {
             position++;
             if (expression[position].Value == ";")

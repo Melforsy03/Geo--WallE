@@ -333,7 +333,7 @@ namespace TokensGeo
          PuntosFigura = Puntos_Arco(p1 , p2 ,p3 ,int.Parse(medida.Value));
         }
         
-        public Arco (string Value , TokenTypes Type , Geometrico root , token point1 ,token point2 , token point3 , token medida) :base (Value , Type)
+        public Arco (string Value , TokenTypes Type , token point1 ,token point2 , token point3 , token medida) :base (Value , Type)
         {
            this.p1 = (point1.Type != TokenTypes.Identifier) ? (Point)point1 : (Point)(point1.tokens[0]) ;
            this.p2 = (point2.Type != TokenTypes.Identifier) ? (Point)point2 : (Point)(point2.tokens[0]) ;

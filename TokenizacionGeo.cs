@@ -70,7 +70,7 @@ namespace Lexer
                 currentToken += currentChar;
                 for (int j = i + 1 ; j < input.Length; j++)
                 {
-                     if(!IsPunctuation(input[j].ToString()) && input[j] != ' ' || IsOperator(input[j].ToString()) || input[j] == 'r' && input[j - 1] == '\'' )
+                     if(!IsPunctuation(input[j].ToString()) && input[j] != ' ' || IsOperator(input[j].ToString()) || input[j] == '\'' && input[j + 1] == 'r' || input[j] == 'r' && input[j - 1] == '\'')
                     {
                        currentToken += input[j];
                        continue;
@@ -146,7 +146,14 @@ namespace Lexer
                           break;
                     }
                 }
-                if (input[i] != ' '  && (input[i] == '\'' && input[i + 1] != 'r' || input[i] == 'r' && input[i-1] != '/') || IsPunctuation(input[i].ToString()))
+                if (input[i] == '\'' && input[i + 1] == 'r')
+                {
+                    i ++;
+                    currentToken = "";
+                    continue;
+
+                }
+                if (input[i] != ' '  && IsPunctuation(input[i].ToString()))
                 {
                 tokens.Add(new token (input[i].ToString()  , TokenTypes.Punctuation));
                 continue;
