@@ -317,12 +317,12 @@ namespace TokensGeo
       {
         public double  medida {get ; set ;}
         public GeoType GeoTyper {get ; set ;}
-        public List<Point> PuntosFigura {get ; set ;}
+        
         public Arco (string Value , TokenTypes Type , string color ) : base (Value , Type , color )
         {
          Random random = new Random(Guid.NewGuid().GetHashCode());
          medida = random.Next(1 , 25);
-         //PuntosFigura = Puntos_Arco(p1 , p2 ,p3 ,medida);
+         puntosFigura = Puntos_Arco(p1 , p2 ,p3 ,medida);
         }
         
         public Arco (string Value , TokenTypes Type , token point1 ,token point2 , token point3 , token medida , string color) :base (Value , Type , color)
@@ -360,13 +360,13 @@ namespace TokensGeo
         {
             double radio = measure;
             double d = Math.Sqrt(Math.Pow(p3.x - p2.x, 2) + Math.Pow(p3.y - p2.y, 2));
-            double angulo = 2 * Math.Asin(d / 2 * radio);
-            double angulo1 = angulo / (30 - 1);
+            double angulo = Math.Atan2(p2.y - p1.y , p2.x - p1.x);
+            
             List<Point> result = new List<Point>();
             for (int i = 1; i < 20; i++)
             {
-                double x = p1.x + radio * (int)Math.Cos(angulo1 / 2 + i * angulo);
-                double y = p1.y + radio * (int)Math.Sin(angulo1 / 2 + i * angulo);
+                double x = p1.x + radio * (int)Math.Cos(angulo);
+                double y = p1.y + radio * (int)Math.Sin(angulo);
                 result.Add(new Point("",TokenTypes.Point , new TokenNumero(x.ToString(),TokenTypes.Number ),new TokenNumero(y.ToString() , TokenTypes.Number)));
             }
 

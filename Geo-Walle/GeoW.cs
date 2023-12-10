@@ -39,10 +39,6 @@ namespace Geo_Walle
         List<PointP> Points_Dibujados;
         List<Circulo> Circulos_Dibujados;
         List<Arco> Arcos_Dibujados;
-        //Pila de los colores q va poniendo el usuario.
-        Stack<Color> color = new Stack<Color>();
-        // color actual de la figuras.
-        Color Fig_Color;
 
         public GeoW()
         {
@@ -59,9 +55,6 @@ namespace Geo_Walle
             Points_Dibujados = new List<PointP>();
             Arcos_Dibujados = new List<Arco>();
             errores = new List<Errors>();
-
-            //if (color.Count <= 0) Fig_Color = Color.Black;
-            //else Fig_Color = color.Pop();
         }
 
         private void btn_volver_Click(object sender, EventArgs e)
@@ -108,19 +101,19 @@ namespace Geo_Walle
             }
             foreach (var item in Figuras_para_dibujar)
             {
-                Paint(item.point1, item.point2, item.figTye, false, Fig_Color);
+                Paint(item.point1, item.point2, item.figTye, false);
             }
             foreach (var item in Circulos_para_dibujar)
             {
-                PaintCirc(item.point1, item.point2, item.figTye, item.media, false, Fig_Color);
+                PaintCirc(item.point1, item.point2, item.figTye, item.media, false);
             }
             foreach (var item in Arcos_para_dibujar)
             {
-                PaintArc(item.point1, item.point2, item.point3, item.figTye, item.media, false, Fig_Color);
+                PaintArc(item.point1, item.point2, item.point3, item.figTye, item.media, false);
             }
         }
 
-        private void PaintCirc(PointP point1, PointP point2, FigTye figura, int media, bool esta, Color color)
+        private void PaintCirc(PointP point1, PointP point2, FigTye figura, int media, bool esta)
         {
             Graphics lienzo = Lienzo.CreateGraphics();
             if (!esta)
@@ -133,10 +126,10 @@ namespace Geo_Walle
             int radio = media;
 
             Rectangle circle = new Rectangle(point1.x - radio, point1.y - radio, radio * 2, radio * 2);
-            lienzo.DrawEllipse(new Pen(color), circle);
+            lienzo.DrawEllipse(new Pen(Color.Black), circle);
         }
 
-        private void Paint(PointP point1, PointP point2, FigTye figura, bool esta, Color color)
+        private void Paint(PointP point1, PointP point2, FigTye figura, bool esta)
         {
             Graphics lienzo = Lienzo.CreateGraphics();
             if (!esta)
@@ -150,7 +143,7 @@ namespace Geo_Walle
 
             if (figura == FigTye.segment)
             {
-                lienzo.DrawLine(new Pen(color), point1.x + 2, point1.y + 2, point2.x + 2, point2.y + 2);
+                lienzo.DrawLine(new Pen(Color.Black), point1.x + 2, point1.y + 2, point2.x + 2, point2.y + 2);
             }
             else if (figura == FigTye.line)
             {
@@ -160,8 +153,8 @@ namespace Geo_Walle
                 PointP interseccion_Top = new PointP("p1", (int)(point2.x + (0 - point2.y) / pendiente_m), 0);
                 PointP interseccion_Dwn = new PointP("p2", (int)(point2.x + ((this.Height - 1) - point2.y) / pendiente_m), this.Height - 1);
 
-                lienzo.DrawLine(new Pen(color), interseccion_izq.x + 2, interseccion_izq.y + 2, interseccion_der.x + 2, interseccion_der.y + 2);
-                lienzo.DrawLine(new Pen(color), interseccion_Top.x + 2, interseccion_Top.y + 2, interseccion_Dwn.x + 2, interseccion_Dwn.y + 2);
+                lienzo.DrawLine(new Pen(Color.Black), interseccion_izq.x + 2, interseccion_izq.y + 2, interseccion_der.x + 2, interseccion_der.y + 2);
+                lienzo.DrawLine(new Pen(Color.Black), interseccion_Top.x + 2, interseccion_Top.y + 2, interseccion_Dwn.x + 2, interseccion_Dwn.y + 2);
             }
             else if (figura == FigTye.ray)
             {
@@ -177,12 +170,12 @@ namespace Geo_Walle
                 float interseccionY_der = pendiente_m * interseccionX_der + b;
                 PointP interseccion_Der = new PointP("id", (int)interseccionX_der, (int)interseccionY_der);
 
-                lienzo.DrawLine(new Pen(color), point1.x + 2, point1.y + 2, point2.x + 2, point2.y + 2);
-                //lienzo.DrawLine(new Pen(Color.Brown), interseccion_Izq.x, interseccion_Izq.y, 0, interseccion_Izq.y);
-                lienzo.DrawLine(new Pen(color), point2.x + 2, point2.y + 2, interseccion_Der.x, interseccion_Der.y);
+                lienzo.DrawLine(new Pen(Color.Black), point1.x + 2, point1.y + 2, point2.x + 2, point2.y + 2);
+                //lienzo.DrawLine(new Pen(Color.Black.Brown), interseccion_Izq.x, interseccion_Izq.y, 0, interseccion_Izq.y);
+                lienzo.DrawLine(new Pen(Color.Black), point2.x + 2, point2.y + 2, interseccion_Der.x, interseccion_Der.y);
             }
         }
-        private void PaintArc(PointP point1, PointP point2, PointP centro, FigTye figura, int media, bool esta, Color color)
+        private void PaintArc(PointP point1, PointP point2, PointP centro, FigTye figura, int media, bool esta)
         {
             Graphics lienzo = Lienzo.CreateGraphics();
             if (!esta)
@@ -213,7 +206,7 @@ namespace Geo_Walle
             if (angulo_AB > 0 && angulo_AC < 0) angula_AC_AB = angulo_AB - angulo_AC;
 
             Rectangle arc = new Rectangle(centro.x - radio, centro.y - radio, radio * 2, radio * 2);
-            lienzo.DrawArc(new Pen(color), arc, angulo_AC, angula_AC_AB);
+            lienzo.DrawArc(new Pen(Color.Black), arc, angulo_AC, angula_AC_AB);
         }
 
         private void PaintPoint(PointP point, bool esta)
@@ -285,17 +278,17 @@ namespace Geo_Walle
             for (int i = 0; i < Figuras_Dibujadas.Count; i++)
             {
                 Figuras_Dibujadas[i].Traslate(x, y);
-                Paint(Figuras_Dibujadas[i].point1, Figuras_Dibujadas[i].point2, Figuras_Dibujadas[i].figTye, true, Fig_Color);
+                Paint(Figuras_Dibujadas[i].point1, Figuras_Dibujadas[i].point2, Figuras_Dibujadas[i].figTye, true);
             }
             for (int i = 0; i < Arcos_Dibujados.Count; i++)
             {
                 Arcos_Dibujados[i].Traslate(x, y);
-                PaintArc(Arcos_Dibujados[i].point1, Arcos_Dibujados[i].point2, Arcos_Dibujados[i].point3, Arcos_Dibujados[i].figTye, Arcos_Dibujados[i].media, true, Fig_Color);
+                PaintArc(Arcos_Dibujados[i].point1, Arcos_Dibujados[i].point2, Arcos_Dibujados[i].point3, Arcos_Dibujados[i].figTye, Arcos_Dibujados[i].media, true);
             }
             for (int i = 0; i < Circulos_Dibujados.Count; i++)
             {
                 Circulos_Dibujados[i].Traslate(x, y);
-                PaintCirc(Circulos_Dibujados[i].point1, Circulos_Dibujados[i].point2, Circulos_Dibujados[i].figTye, Circulos_Dibujados[i].media, true, Fig_Color);
+                PaintCirc(Circulos_Dibujados[i].point1, Circulos_Dibujados[i].point2, Circulos_Dibujados[i].figTye, Circulos_Dibujados[i].media, true);
             }
             for (int i = 0; i < Points_Dibujados.Count; i++)
             {
