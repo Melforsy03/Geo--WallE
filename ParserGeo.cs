@@ -1102,7 +1102,6 @@ namespace ParserGeo
             }
             if (A is FuncionPointsDos || B is Arco)
             {   
-            
                  double d = Math.Sqrt(Math.Pow(((Arco)B).p3.x - ((Arco)B).p2.x, 2) + Math.Pow(((Arco)B).p3.y - ((Arco)B).p2.y, 2));
                  double angulo = 2 * Math.Asin(d / 2 * int.Parse(((Arco)B).medida.Value));
                  double angulo1 = angulo / (30 - 1);
