@@ -97,6 +97,13 @@ namespace Lexer
                             break ;
                         }
                     }
+                    else if (colores(currentToken) && tokens[tokens.Count - 1].Value == "color")
+                    {
+                        tokens[tokens.Count - 1] = new token (currentToken , TokenTypes.Color);
+                        currentToken = "";
+                        i = j ;
+                        break;
+                    }
                     //tokens que son tipo comando 
                     else if(IsComando(currentToken))
                     {
@@ -188,9 +195,13 @@ namespace Lexer
      {
         return c == "if"|| c == "else" || c == "let" || c == "in"|| c == "then" ;
      }
-    public  static bool errores (char c )
+    private static bool errores (char c )
     {
         return c =='@'|| c == '#' || c == '$' || c  == '!'|| c == '?' || c == '~';
+    }
+    public static bool colores (string color)
+    {
+        return color == "red" || color == "green" || color == "yellow" || color == "orange" || color == "blue";
     }
    }
 

@@ -184,28 +184,17 @@ namespace TokensGeo
   public class FuncionPointsDos : Figura
   {
    
-    
-
      public List<Point> puntosFigura {get ; set;}
    
     public GeoType GeoType ;
 
-    public FuncionPointsDos(string Value, TokenTypes Type, token point1, token point2) : base (Value , Type)
+    public FuncionPointsDos(string Value, TokenTypes Type, token point1, token point2 , string color) : base (Value , Type , color)
     {
      this.p1 = (point1.Type != TokenTypes.Identifier) ? (Point)point1 : (Point)(point1.tokens[0]) ;
      this.p2 = (point2.Type != TokenTypes.Identifier) ? (Point)point2 : (Point)(point2.tokens[0]) ;
     }
-    public FuncionPointsDos(string Value, TokenTypes Type) : base(Value, Type)
+    public FuncionPointsDos(string Value, TokenTypes Type , string color) : base(Value, Type , color)
     {
-      Random random = new Random(100);
-      p1.x = random.Next(1,100);
-      Thread.Sleep(100);
-      p1.y = random.Next(1,100); 
-      Thread.Sleep(100);
-      p2.x = random.Next(1,100);
-      Thread.Sleep(100);
-      p2.y = random.Next(1,100);
-      Thread.Sleep(100);
       puntosFigura = Puntos_Recta(p1 , p2);
       
     }
@@ -234,9 +223,9 @@ namespace TokensGeo
             List<Point> result = new List<Point>();
             double menos = (p1.x < p2.x) ? p1.x : p2.x;
             double mayor = (p1.x > p2.x) ? p1.x : p2.x;
-             for (double x = p1.x; x <= p2.x; x++)
+             for (double x = menos; x <= mayor; x++)
             {
-                double y = ((p2.y - p1.y) / (p2.x - p1.x)) * (x - p1.x) + p1.y;
+                double y = Math.Ceiling((((p2.y - p1.y) /(p2.x - p1.x) + 1)  * (x - p1.x) + p1.y));
                 result.Add(new Point("",TokenTypes.Point , new TokenNumero(x.ToString() , TokenTypes.Number),new TokenNumero( y.ToString() , TokenTypes.Number)));
             }
             return result;
@@ -319,38 +308,24 @@ namespace TokensGeo
       return secuencia1;
     }
   }
-   public class Arco : FuncionPointsDos
+  public class Arco : FuncionPointsDos
       {
-        public Point p1 { get ; set ;}
-        public Point p2 {get ; set ;}
-        public Point p3 {get ; set ;}
-        public Measure medida {get ; set ;}
+        public double  medida {get ; set ;}
         public GeoType GeoTyper {get ; set ;}
         public List<Point> PuntosFigura {get ; set ;}
-        public Arco (string Value , TokenTypes Type , Geometrico root ) : base (Value , Type )
+        public Arco (string Value , TokenTypes Type , string color ) : base (Value , Type , color )
         {
-        Random random = new Random(100);
-         p1.x = random.Next(1,100);
-         Thread.Sleep(100);
-         p1.y = random.Next(1,100); 
-         Thread.Sleep(100);
-         p2.x = random.Next(1,100);
-         Thread.Sleep(100);
-         p2.y = random.Next(1,100);
-         Thread.Sleep(100);
-         p3.x = random.Next(1 , 100);
-         Thread.Sleep(100);
-         p3.y = random.Next(1 , 100);
-         medida.Value = random.Next(1 , 25).ToString();
-         PuntosFigura = Puntos_Arco(p1 , p2 ,p3 ,int.Parse(medida.Value));
+         Random random = new Random(Guid.NewGuid().GetHashCode());
+         medida = random.Next(1 , 25);
+         //PuntosFigura = Puntos_Arco(p1 , p2 ,p3 ,medida);
         }
         
-        public Arco (string Value , TokenTypes Type , token point1 ,token point2 , token point3 , token medida) :base (Value , Type)
+        public Arco (string Value , TokenTypes Type , token point1 ,token point2 , token point3 , token medida , string color) :base (Value , Type , color)
         {
            this.p1 = (point1.Type != TokenTypes.Identifier) ? (Point)point1 : (Point)(point1.tokens[0]) ;
            this.p2 = (point2.Type != TokenTypes.Identifier) ? (Point)point2 : (Point)(point2.tokens[0]) ;
            this.p3 = (point1.Type != TokenTypes.Identifier) ? (Point)point3 : (Point)(point3.tokens[0]) ;
-           this.medida = (medida.Type != TokenTypes.Identifier) ? (Measure)medida : (Measure)(medida.tokens[0]);
+           this.medida = (medida.Type != TokenTypes.Identifier) ? int.Parse(medida.Value) : int.Parse(medida.tokens[0].Value);
         }
          bool puntos = true;
 
@@ -376,9 +351,9 @@ namespace TokensGeo
           }
           return true;
       }
-       public List<Point> Puntos_Arco(Point p1, Point p2,Point p3, int measure)
+       public List<Point> Puntos_Arco(Point p1, Point p2,Point p3, double measure)
         {
-            int radio = measure;
+            double radio = measure;
             double d = Math.Sqrt(Math.Pow(p3.x - p2.x, 2) + Math.Pow(p3.y - p2.y, 2));
             double angulo = 2 * Math.Asin(d / 2 * radio);
             double angulo1 = angulo / (30 - 1);
@@ -393,34 +368,28 @@ namespace TokensGeo
             return result;
         }
     }
-    public class Circunferencia : Figura
+  public class Circunferencia : Figura
       {
         public Point p1 {get ; set ;}
 
-        public token punto1 {get ; set ;}
-
-        public Measure medida {get ; set ;}
+        public int medida {get ; set ;}
         
-        public  List<Point> PuntosFigura {get ; set ;}
-        public Circunferencia (string Value , TokenTypes Type ) :base (Value ,Type )
+
+        public Circunferencia (string Value , TokenTypes Type , string color) :base (Value ,Type , color)
         {
           Random random = new Random(100);
-          p1.x = random.Next(1,100);
-          Thread.Sleep(100);
-          p1.y = random.Next(1,100); 
-          Thread.Sleep(100);
-          medida.Value = random.Next(1,20).ToString();
-          PuntosFigura = Puntos_Ciscunferencia(p1 , medida.p2 , int.Parse(medida.Value));
-          PuntosFigura.Add(p1);
-          PuntosFigura.Add(medida.p2);
+          
+          medida = random.Next(1,20);
+          //PuntosFigura = Puntos_Ciscunferencia(p1 , medida.p2 , int.Parse(medida.Value));
+          //PuntosFigura.Add(p1);
+          //PuntosFigura.Add(medida.p2);
         }
-        public Circunferencia (string Value , TokenTypes Type , token p1 , token medida ) : base (Value , Type )
+        public Circunferencia (string Value , TokenTypes Type , token p1 , token medida , string color ) : base (Value , Type , color)
         {
-          this.punto1 = (p1.Type != TokenTypes.Identifier)? (Point)p1 : (Point)p1.tokens[0];
-          this.medida = (medida.Type != TokenTypes.Identifier) ?(Measure)medida : (Measure)p1.tokens[0];
-          PuntosFigura = Puntos_Ciscunferencia((Point)p1 , ((Measure)medida).p2 , int.Parse(medida.Value));
-          PuntosFigura.Add((Point)p1);
-          PuntosFigura.Add(((Measure)medida).p2);
+          this.p1 = (p1.Type != TokenTypes.Identifier)? (Point)p1 : (Point)p1.tokens[0];
+          this.medida = (medida.Type != TokenTypes.Identifier) ? int.Parse(medida.Value) : int.Parse(p1.tokens[0].Value);
+         Puntos_Ciscunferencia( (Point)p1 , this.medida);
+          puntosFigura.Add((Point)p1);
         }
         bool puntos = true;
         public  GeoType GeoType {get ; set ;}
@@ -454,18 +423,16 @@ namespace TokensGeo
          }
           return true;
         }
-         public List<Point> Puntos_Ciscunferencia(Point p1, Point p2, int measure)
+         public void Puntos_Ciscunferencia(Point p1, int measure)
         {
             int radio = measure;
-            List<Point> result = new List<Point>();
-
-            for (int i = 1; i < 20; i++)
+            
+            for (double x = p1.x ; x < 60; x++)
             {
-                double x = p1.x + radio;
-                double y = p1.y + radio;
-                result.Add(new Point("",TokenTypes.Point, new TokenNumero(x.ToString(),TokenTypes.Number),new TokenNumero(y.ToString() , TokenTypes.Number)));
+                double y = Math.Ceiling(p1.y + Math.Sqrt(Math.Pow(measure - (x - p1.x) , 2 )));
+                puntosFigura.Add(new Point("",TokenTypes.Point, new TokenNumero(x.ToString(),TokenTypes.Number),new TokenNumero(y.ToString() , TokenTypes.Number)));
             }
-            return result;
+            
         }
       
       }
@@ -681,12 +648,15 @@ namespace TokensGeo
     public Point p2 {get ; set ;}
 
     public Point p3 {get; set ;}
-    public Figura (string Value , TokenTypes Type ) : base(Value , Type)
+
+    public string color {get ; set ;}
+    public Figura (string Value , TokenTypes Type  , string color) : base(Value , Type)
     {
       p1 = new Point("" , TokenTypes.Point);
       p2 = new Point("", TokenTypes.Point);
-      p2 = new Point("", TokenTypes.Point);
+      p3 = new Point("", TokenTypes.Point);
       puntosFigura = new List<Point>();
+      this.color = color ;
     }
   }
 }
