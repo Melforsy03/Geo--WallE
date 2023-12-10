@@ -40,11 +40,11 @@ namespace Geo_Walle
             this.media = media;
         }
     }
-    public class Arco : Circulo
+    public class Arc : Circulo
     {
         public PointP point3;
 
-        public Arco(PointP point1, PointP point2, PointP point3, FigTye figType, int media) : base(point1, point2, figType, media)
+        public Arc(PointP point1, PointP point2, PointP point3, FigTye figType, int media) : base(point1, point2, figType, media)
         {
             this.point3 = point3;
         }

@@ -33,12 +33,12 @@ namespace Geo_Walle
         //circunferencias
         List<Circulo> Circulos_para_dibujar;
         //Arcos
-        List<Arco> Arcos_para_dibujar;
+        List<Arc> Arcos_para_dibujar;
         // Listas de las figuras que ya estan dibujadas en el lienzo.
         List<Figuras> Figuras_Dibujadas;
         List<PointP> Points_Dibujados;
         List<Circulo> Circulos_Dibujados;
-        List<Arco> Arcos_Dibujados;
+        List<Arc> Arcos_Dibujados;
 
         public GeoW()
         {
@@ -47,13 +47,13 @@ namespace Geo_Walle
             Puntos_para_dibujar = new List<PointP>();
             Figuras_para_dibujar = new List<Figuras>();
             Circulos_para_dibujar = new List<Circulo>();
-            Arcos_para_dibujar = new List<Arco>();
+            Arcos_para_dibujar = new List<Arc>();
 
             Figuras_del_Parser = new List<token>();
             Figuras_Dibujadas = new List<Figuras>();
             Circulos_Dibujados = new List<Circulo>();
             Points_Dibujados = new List<PointP>();
-            Arcos_Dibujados = new List<Arco>();
+            Arcos_Dibujados = new List<Arc>();
             errores = new List<Errors>();
         }
 
@@ -66,7 +66,6 @@ namespace Geo_Walle
         {
             try
             {
-
                 impud = txtBox_codigo.Text;
                 List<token> m = Tokenizar.TokenizeString(impud,errores);
                 Geometrico arbol = new Geometrico("", TokenTypes.Identifier, null);
@@ -180,7 +179,7 @@ namespace Geo_Walle
             Graphics lienzo = Lienzo.CreateGraphics();
             if (!esta)
             {
-                Arcos_Dibujados.Add(new Arco(point1, point2, centro, figura, media));
+                Arcos_Dibujados.Add(new Arc(point1, point2, centro, figura, media));
                 esta = true;
             }
             PaintPoint(point1, esta);
@@ -250,7 +249,7 @@ namespace Geo_Walle
             Figuras_Dibujadas = new List<Figuras>();
             Points_Dibujados = new List<PointP>();
             Circulos_Dibujados = new List<Circulo>();
-            Arcos_Dibujados = new List<Arco>();
+            Arcos_Dibujados = new List<Arc>();
             lienzo.Clear(Color.Gray);
         }
         private void btn_arriba_Click(object sender, EventArgs e)
@@ -323,42 +322,46 @@ namespace Geo_Walle
                     {
                         if (draw[j] is Point)
                         {
-
                             PointP p1 = new PointP(draw[j].Value, Convert.ToInt32(((Point)draw[j]).x),Convert.ToInt32(((Point)draw[j]).y));
                             Puntos_para_dibujar.Add(p1);
                         }
                         if (draw[j] is Segment)
                         {
-                            PointP p1 = new PointP(draw[j].Value, Convert.ToInt32(((Point)draw[j]).x),Convert.ToInt32(((Point)draw[j]).y));
-                            PointP p2 = new PointP(draw[j].Value, Convert.ToInt32(((Point)draw[j]).x),Convert.ToInt32(((Point)draw[j]).y));
+                            PointP p1 = new PointP(((Segment)draw[j]).p1.Value, Convert.ToInt32(((Segment)draw[j]).p1.x),Convert.ToInt32(((Segment)draw[j]).p1.y));
+                            PointP p2 = new PointP(((Segment)draw[j]).p2.Value, Convert.ToInt32(((Segment)draw[j]).p2.x),Convert.ToInt32(((Segment)draw[j]).p2.y));
+                            string color = ((Segment)draw[j]).color;
                             Figuras_para_dibujar.Add(new Figuras(p1, p2, FigTye.segment));
                         }
                         if (draw[j] is Line)
                         {
-                            PointP p1 = new PointP(draw[j].Value, Convert.ToInt32(((Point)draw[0]).x),Convert.ToInt32(((Point)draw[0]).y));
-                            PointP p2 = new PointP(draw[j].Value, Convert.ToInt32(((Point)draw[1]).x),Convert.ToInt32(((Point)draw[1]).y)); 
+                            PointP p1 = new PointP(((Line)draw[j]).p1.Value, Convert.ToInt32(((Segment)draw[j]).p1.x),Convert.ToInt32(((Segment)draw[j]).p1.y));
+                            PointP p2 = new PointP(((Line)draw[j]).p2.Value, Convert.ToInt32(((Segment)draw[j]).p2.x),Convert.ToInt32(((Segment)draw[j]).p2.y)); 
+                            string color = ((Line)draw[j]).color;
                             Figuras_para_dibujar.Add(new Figuras(p1, p2, FigTye.line));
                         }
                         if (draw[j] is Ray)
                         {
-                            PointP p1 = new PointP(draw[j].Value, Convert.ToInt32(((Point)draw[0]).x),Convert.ToInt32(((Point)draw[0]).y));
-                            PointP p2 = new PointP(draw[j].Value, Convert.ToInt32(((Point)draw[1]).x),Convert.ToInt32(((Point)draw[1]).y)); 
+                            PointP p1 = new PointP(((Ray)draw[j]).p1.Value, Convert.ToInt32(((Segment)draw[j]).p1.x),Convert.ToInt32(((Segment)draw[j]).p1.y));
+                            PointP p2 = new PointP(((Ray)draw[j]).p2.Value, Convert.ToInt32(((Segment)draw[j]).p2.x),Convert.ToInt32(((Segment)draw[j]).p2.y)); 
+                            string color = ((Ray)draw[j]).color;
                             Figuras_para_dibujar.Add(new Figuras(p1, p2, FigTye.ray));
                         }
                         if (draw[j] is Circunferencia)
                         {
-                            PointP p1 = new PointP(draw[j].Value, Convert.ToInt32(((Point)draw[0]).x),Convert.ToInt32(((Point)draw[0]).y));
-                            PointP p2 = new PointP(draw[j].Value, Convert.ToInt32(((Point)draw[1]).x),Convert.ToInt32(((Point)draw[1]).y)); 
-                            int media = (int)Math.Sqrt(Math.Pow(p2.x - p1.x, 2) + Math.Pow(p2.y - p1.y, 2));
+                            PointP p1 = new PointP(((Circunferencia)draw[j]).p1.Value, Convert.ToInt32(((Segment)draw[j]).p1.x),Convert.ToInt32(((Segment)draw[j]).p1.y));
+                            PointP p2 = new PointP(((Circunferencia)draw[j]).p2.Value, Convert.ToInt32(((Segment)draw[j]).p2.x),Convert.ToInt32(((Segment)draw[j]).p2.y));
+                            string color = ((Circunferencia)draw[j]).color; 
+                            int media = ((Circunferencia)draw[j]).medida;
                             Circulos_para_dibujar.Add(new Circulo(p1, p2, FigTye.circle, media));
                         }
                         if (draw[j] is Arco)
                         {
-                            PointP p1 = new PointP(draw[j].tokens[0].Value, Convert.ToInt32(((Point)draw[0]).x),Convert.ToInt32(((Point)draw[0]).y));
-                            PointP p2 = new PointP(draw[1].Value, Convert.ToInt32(((Point)draw[1]).x),Convert.ToInt32(((Point)draw[1]).y));
-                            PointP p3 = new PointP(draw[2].Value, Convert.ToInt32(((Point)draw[2]).x),Convert.ToInt32(((Point)draw[2]).y));
-                            int media = (int)Math.Sqrt(Math.Pow(p2.x - p1.x, 2) + Math.Pow(p2.y - p1.y, 2));
-                            Arcos_para_dibujar.Add(new Arco(p1, p2, p3, FigTye.circle, media));
+                            PointP p1 = new PointP(((Arco)draw[j]).p1.Value, Convert.ToInt32(((Segment)draw[j]).p1.x),Convert.ToInt32(((Segment)draw[j]).p1.y));
+                            PointP p2 = new PointP(((Arco)draw[j]).p2.Value, Convert.ToInt32(((Segment)draw[j]).p2.x),Convert.ToInt32(((Segment)draw[j]).p2.y));
+                            PointP p3 = new PointP(((Arco)draw[j]).p3.Value, Convert.ToInt32(((Segment)draw[j]).p3.y),Convert.ToInt32(((Segment)draw[j]).p3.y));
+                            string color = ((Arco)draw[j]).color;
+                            int media = Convert.ToInt32(((Arco)draw[j]).medida);
+                            Arcos_para_dibujar.Add(new Arc(p1, p2, p3, FigTye.circle, media));
                         }
                     }
                 }       

@@ -32,17 +32,18 @@ namespace ParserGeo
     //public Stack <Color> colors {get ; set ;}
 
     // constructor del arbol
-   public Geometrico (string Value , TokenTypes Type , Geometrico Root) : base (Value , Type )
-   {
-    
-      this.Value = Value ; 
-      this.Type = Type ;
-      variablesLocales = new List<token>();
-      variablesGlobales = new List<token>();
-      this.Root = Root;
-      this.color = new Stack<string>();
+        public Geometrico (string Value , TokenTypes Type , Geometrico Root) : base (Value , Type )
+        {
+
+            this.Value = Value;
+            this.Type = Type;
+            variablesLocales = new List<token>();
+            variablesGlobales = new List<token>();
+            this.Root = Root;
+            this.color = new Stack<string>();
+            color.Push("black");
       
-   }
+        }
    // metodo que me chequea la semantica del arbol
    public  bool CheckSemantic(List<Errors> errores)
    {
