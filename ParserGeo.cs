@@ -820,39 +820,35 @@ namespace ParserGeo
   {
     return ((expression[position].Type == TokenTypes.Identifier && variablesLocales.Any(valor => valor.Value == expression[position].Value) == false && variablesGlobales.Any(valor => valor.Value == expression[position].Value) == false) || position + 2 < expression.Count - 1 &&  expression[position + 2].Value == "{") || TipoSecuencia(expression[position].Value) || expression[position].Value == "point sequence" || expression[position].Value  == "line sequence";
   }
-  public Geometrico DrawFunction()
+  public token DrawFunction()
   {
-    Geometrico drawFuncion = new Geometrico("draw" , TokenTypes.Comando, this);
+    token drawFuncion = new token("draw" , TokenTypes.Comando);
     if (TiposFigura (expression[position].Value))
     {
         drawFuncion.Value = expression[position].Value;
         position++;
     }
-    drawFuncion.variablesGlobales.AddRange(drawFuncion.Root.variablesGlobales.Select (x => x));
-    drawFuncion.variablesGlobales.AddRange(drawFuncion.Root.variablesLocales.Select (x => x));
-    drawFuncion.variablesGlobales = drawFuncion.variablesGlobales.Distinct().ToList();
-    drawFuncion.position = position;
-    drawFuncion.expression = expression;
-    if(expression[drawFuncion.position].Value == "(")drawFuncion.position++;
-    while (expression[drawFuncion.position].Value != ";")
+    
+    if(expression[position].Value == "(")position++;
+    while (expression[position].Value != ";")
     {
-        drawFuncion.tokens.Add(drawFuncion.ParseTerm());
+        drawFuncion.tokens.Add(ParseTerm());
         
-        if (expression[drawFuncion.position].Value == ")")
+        if (expression[position].Value == ")")
         {
             while(expression[position].Value != ")" )
         {
-            drawFuncion.position++;
-            if (expression[drawFuncion.position].Value == ";")
+            position++;
+            if (expression[position].Value == ";")
             {
                 break; 
             }
         }
         }
-        if(expression[drawFuncion.position].Value == ",") drawFuncion.position++;
-        else if (expression[drawFuncion.position].Value == ";")
+        if(expression[position].Value == ",") position++;
+        else if (expression[position].Value == ";")
         {
-            position = drawFuncion.position;
+            position = position;
               break;
         }
         

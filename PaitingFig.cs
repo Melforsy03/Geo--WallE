@@ -109,10 +109,18 @@ public class Ray : FuncionPointsDos
 }
 public class Measure : FuncionPointsDos
 {
-    int distancia = 0;
+    double distancia = 0;
     public Measure (string Value , TokenTypes Type) : base (Value , Type){}
 
-    public Measure(string Value, TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2) { }
+    public Measure(string Value ,TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2) 
+    {
+        distancia = CalculoMedida();
+    }
+    
+    private double CalculoMedida ()
+    {
+        return Math.Sqrt(Math.Pow(p2.x - p1.x , 2) + Math.Pow(p2.y - p1.y , 2));
+    }
 
 }
 
