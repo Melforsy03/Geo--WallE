@@ -19,7 +19,7 @@ namespace ParserGeo
     public  List<token> expression {get ;set ;} 
     //posicion con la que se va a recorrer recursivamente
     public int position {get ; set ;}
-    public Stack <Color> colors {get ; set ;}
+    //public Stack <Color> colors {get ; set ;}
     public List<Errors> errores {get ; set ;}
     // constructor del arbol
    public Geometrico (string Value , TokenTypes Type , Geometrico Root) : base (Value , Type )
@@ -227,6 +227,10 @@ namespace ParserGeo
         token node  = null ;
         
          string ValorDelToken = expression[position].Value;
+         if(expression[position] is Identificador && variablesLocales.Any(valor => valor.Value == expression[position].Value) && expression[position + 1].Value == "=" )
+         {
+            new ArgumentException("esta variables ya fue definida en este contexto");
+         }
          // me devuelve una funcion definida en el lenguaje
          if (expression[position] is Identificador && expression[position + 1].Value == "(")
          {
@@ -234,7 +238,7 @@ namespace ParserGeo
             return FuncionesGeo(ValorDelToken);
          }
          //devuelve una figura
-         else if( TiposFigura(ValorDelToken) || variablesLocales.Any(valor => valor.Value == Value))
+         else if( TiposFigura(ValorDelToken) || variablesLocales.Any(valor => valor.Value == expression[position].Value))
         {
            return Figura(ValorDelToken);
         }
@@ -499,7 +503,7 @@ namespace ParserGeo
             }
             if(fig.tokens.Count != 0 )
             {
-                if(fig.tokens[0].Type != TokenTypes.Identifier && fig.tokens[0].Type != TokenTypes.Number ||  fig.tokens[1].Type != TokenTypes.Identifier && fig.tokens [1].Type != TokenTypes.Number )
+                if(fig.tokens[0].Type != TokenTypes.Identifier && fig.tokens[0].Type != TokenTypes.Point|| fig.tokens[1].Type != TokenTypes.Identifier && fig.tokens [1].Type != TokenTypes.Point )
                 {
                   new ArgumentException ("los parametros pasados al  punto no son validos");
                 }
@@ -524,7 +528,7 @@ namespace ParserGeo
                     }
                     else
                     {
-                    return new Circunferencia(fig.Value , fig.Type , this , fig.tokens[0] ,fig.tokens[1]);
+                    return new Circunferencia(fig.Value , fig.Type , fig.tokens[0] ,fig.tokens[1]);
                     }
                 }
             }
@@ -878,21 +882,27 @@ namespace ParserGeo
   public token DrawFunction()
   {
     token drawFuncion = new token("draw" , TokenTypes.Comando);
+    int corchete = 0;
     if (TiposFigura (expression[position].Value))
     {
         drawFuncion.Value = expression[position].Value;
         position++;
     }
     
-    if(expression[position].Value == "(")position++;
+    if(expression[position].Value == "(")
+    {
+        position++;
+        corchete++;
+    }
     while (expression[position].Value != ";")
     {
         drawFuncion.tokens.Add(ParseTerm());
         
         if (expression[position].Value == ")")
         {
-            while(expression[position].Value == ")" )
+          while(expression[position].Value == ")" )
         {
+            corchete--;
             position++;
             if (expression[position].Value == ";")
             {
@@ -903,12 +913,18 @@ namespace ParserGeo
         if(expression[position].Value == ",") position++;
         else if (expression[position].Value == ";")
         {
-            position = position;
+            if (corchete < 0)
+            {
+                new ArgumentException ("en uno de los draw esperabamos un corchet de apertura");
+            }
+            else if (corchete > 0 )
+            {
+                new ArgumentException("en uno de los draw esperabamos un corchet de cierre");
+            }
               break;
         }
         
     } 
-    
     return drawFuncion;
   }
   private TokenTypes ValorNombreFigura (string c )
@@ -955,7 +971,7 @@ namespace ParserGeo
   {
     token secuencia = new token("contenedor" , TokenTypes.secuencia);
     List<token> componentes = new List<token>();
-    int posibleVacio = 35;
+    int posibleVacio = 20;
     int corchetes = 1;
     while (expression[position].Value != "}")
     {
@@ -982,7 +998,7 @@ namespace ParserGeo
         {
             break ;
         }
-        if (expression[position].Value == ";")
+        if (expression[position].Value == ";" )
         {
             errores.Add(new Errors(ErrorCode.Semantic , "esperabamos un corchete de cierre"));
             break;
@@ -998,12 +1014,14 @@ namespace ParserGeo
                 else if (expression[position].Value == ";" && corchetes> 0)
                 {
                     errores.Add(new Errors(ErrorCode.Semantic , "se esperaba un corchete de cierre en la secuencia"));
-                    return secuencia;
+                    break;
+                    
                 }
                 if (expression[position].Value == ";" && corchetes <0)
                 {
                    errores.Add(new Errors(ErrorCode.Semantic , "se esperaba un corchete de cierre en la secuencia"));
-                   return secuencia;
+                   break;
+                   
                 }
     }
     if(expression[position].Value != ";")position++;
@@ -1034,30 +1052,30 @@ namespace ParserGeo
     }
     private  token ComandosDIntercepcion(string nombre , Figura a , Figura b)
     {
-         IEnumerable<Point> tokensA = new List<Point>();
-        IEnumerable<Point> tokensB = new List<Point>();
+         List<token>tokensA = new List<token>();
+            List<token> tokensB = new List<token>();
         Figura secuencial = new Figura("secuencia" , TokenTypes.secuencia);
         if(nombre == "intersect")
         {
             if(a.Type == TokenTypes.Identifier)
             {
-                   tokensA = (List<Point>)((Figura)a.tokens[0]).puntosFigura;
+                tokensA = CumpleCondicion((Figura)a.tokens[0] , b).tokens;
             }
             else
             {
-                tokensA = (List<Point>)a.puntosFigura;
+                tokensA = CumpleCondicion(a, b).tokens;
             }
              if(b.Type == TokenTypes.Identifier)
             {
-                   tokensB = (List<Point>)((Figura)b.tokens[0]).puntosFigura;;
+                   //tokensB = (List<Point>)((Figura)b.tokens[0]).puntosFigura;;
             }
             else
             {
-                tokensB = (List<Point>)b.puntosFigura;
+              //  tokensB = (List<Point>)b.puntosFigura;
             }
             
-            List<Point> evaluados = tokensA.Intersect(tokensB).ToList();
-            secuencial.puntosFigura = evaluados;
+           // List<Point> evaluados = tokensA.Intersect(tokensB).ToList();
+           // secuencial.puntosFigura = evaluados;
             return secuencial;
         }
         else 
@@ -1081,12 +1099,14 @@ namespace ParserGeo
         Figura valor = new Figura("",TokenTypes.secuencia);
         List<Point>interseccion = new List<Point>();
         int limite = 2;
-        for (int J = ((FuncionPointsDos)A).p1.x ; J < ((FuncionPointsDos)A).p2.x ; J++)
+        double menor = (((FuncionPointsDos)A).p1.x < ((FuncionPointsDos)B).p2.x) ?((FuncionPointsDos)A).p1.x : ((FuncionPointsDos)B).p2.x ;
+        double mayor = (((FuncionPointsDos)A).p1.x > ((FuncionPointsDos)B).p2.x ) ?((FuncionPointsDos)A).p1.x : ((FuncionPointsDos)B).p2.x ;
+        for (double J = menor ; J < mayor; J++)
         {
             if (A is FuncionPointsDos && B is FuncionPointsDos)
             {
-                int valor1 =((((FuncionPointsDos)A).p2.y -  ((FuncionPointsDos)A).p1.y) / ( ((FuncionPointsDos)A).p2.x -  ((FuncionPointsDos)A).p1.x)) * (J -  ((FuncionPointsDos)A).p1.x) +  ((FuncionPointsDos)A).p1.y;
-                int valor2 =  ((((FuncionPointsDos)B).p2.y -  ((FuncionPointsDos)B).p1.y) / ( ((FuncionPointsDos)B).p2.x -  ((FuncionPointsDos)B).p1.x)) * (J -  ((FuncionPointsDos)B).p1.x) +  ((FuncionPointsDos)B).p1.y;
+                double valor1 =(A.p2.y -  A.p1.y) / (A.p2.x -  A.p1.x )* (J -  A.p1.x) +  A.p1.y;
+                double valor2 =  B.p2.y -  B.p1.y / ( B.p2.x -  (B.p1.x)) * (J -  B.p1.x) +  B.p1.y;
                 if(limite > 0 && valor1 == valor2)
                 {
                     Point punto = new Point("", TokenTypes.Point);
@@ -1100,15 +1120,15 @@ namespace ParserGeo
                     return new Underfine("infinito" , TokenTypes.Underfine);
                 }
             }
-            if (A is FuncionPointsDos || B is Arco)
+            if (A is FuncionPointsDos && B is Arco)
             {   
                  double d = Math.Sqrt(Math.Pow(((Arco)B).p3.x - ((Arco)B).p2.x, 2) + Math.Pow(((Arco)B).p3.y - ((Arco)B).p2.y, 2));
                  double angulo = 2 * Math.Asin(d / 2 * int.Parse(((Arco)B).medida.Value));
                  double angulo1 = angulo / (30 - 1);
-                 int x1 = ((Arco)A).p1.x + int.Parse(((Arco)A).medida.Value) * (int)Math.Cos(angulo1 / 2 + J * angulo);
-                 int y = ((Arco)A).p1.x + int.Parse(((Arco)A).medida.Value) * (int)Math.Sin(angulo1 / 2 + J * angulo);
-                 int valor2 =  ((((FuncionPointsDos)A).p2.y -  ((FuncionPointsDos)A).p1.y) / ( ((FuncionPointsDos)A).p2.x -  ((FuncionPointsDos)A).p1.x)) * (J -  ((FuncionPointsDos)A).p1.x) +  ((FuncionPointsDos)A).p1.y;  
-                 int valor1 =  ((x1 - y) / (x1 - y)) * (J - y) + y;  
+                 double x1 = B.p1.x + int.Parse(((Arco)B).medida.Value) * (int)Math.Cos(angulo1 / 2 + J * angulo);
+                 double y = B.p1.x + int.Parse(((Arco)B).medida.Value) * (int)Math.Sin(angulo1 / 2 + J * angulo);
+                 double valor2 =  (A.p2.y -  ((FuncionPointsDos)A).p1.y) / (A.p2.x -  A.p1.x) * (J -  A.p1.x) +  ((FuncionPointsDos)A).p1.y;  
+                 double  valor1 =  ((x1 - y) / (x1 - y)) * (J - y) + y;  
                  if (limite > 0 && valor1 == valor2)
                  {
                     Point punto = new Point("", TokenTypes.Point);
@@ -1122,12 +1142,50 @@ namespace ParserGeo
                     return new Underfine("infinito" , TokenTypes.Underfine);
                  }           
             }
+            if (A is Arco && B is FuncionPointsDos)
+            {
+                double d = Math.Sqrt(Math.Pow(((Arco)A).p3.x - ((Arco)A).p2.x, 2) + Math.Pow(((Arco)A).p3.y - ((Arco)A).p2.y, 2));
+                 double angulo = 2 * Math.Asin(d / 2 * int.Parse(((Arco)A).medida.Value));
+                 double angulo1 = angulo / (30 - 1);
+                 double x1 = ((Arco)A).p1.x + double.Parse(((Arco)A).medida.Value) * (int)Math.Cos(angulo1 / 2 + J * angulo);
+                 double y = ((Arco)A).p1.x + double.Parse(((Arco)A).medida.Value) * (int)Math.Sin(angulo1 / 2 + J * angulo);
+                 double valor2 =  ((((FuncionPointsDos)B).p2.y -  ((FuncionPointsDos)B).p1.y) / ( ((FuncionPointsDos)B).p2.x -  ((FuncionPointsDos)B).p1.x)) * (J -  ((FuncionPointsDos)B).p1.x) +  ((FuncionPointsDos)B).p1.y;  
+                 double valor1 =  ((x1 - y) / (x1 - y)) * (J - y) + y;  
+                 if (limite > 0 && valor1 == valor2)
+                 {
+                    Point punto = new Point("", TokenTypes.Point);
+                    punto.x = J;
+                    punto.y = valor1;
+                    interseccion.Add(punto);
+                    limite --;
+            }
             
         }
-        valor.puntosFigura = interseccion;
+            if (A is Arco && B is Arco)
+            {
+                 double d = Math.Sqrt(Math.Pow(((Arco)B).p3.x - ((Arco)B).p2.x, 2) + Math.Pow(((Arco)B).p3.y - ((Arco)B).p2.y, 2));
+                 double angulo = 2 * Math.Asin(d / 2 * int.Parse(((Arco)B).medida.Value));
+                 double angulo1 = angulo / (30 - 1);
+                 double d1 = Math.Sqrt(Math.Pow(((Arco)A).p3.x - ((Arco)A).p2.x, 2) + Math.Pow(((Arco)A).p3.y - ((Arco)A).p2.y, 2));
+                 double angulo2 = 2 * Math.Asin(d / 2 * int.Parse(((Arco)A).medida.Value));
+                 double angulo3= angulo2 / (30 - 1);
+                 if (angulo1 == angulo3)
+                 {
+                    Point punto = new Point("", TokenTypes.Point);
+                    punto.x = J;
+                    punto.y = angulo1;
+                    interseccion.Add(punto);
+                    limite --;
+                 }
+            }
+           /* if(A is Circunferencia && B is Circunferencia)
+            {
+                double valor1 = Math.Pow(A.p1.x - J , 2) + Math.Pow(A.p.y - )
+            }*/
+            valor.puntosFigura = interseccion;
+        }
         return valor;
-    }
-
    
+}
 }
 }

@@ -1,12 +1,11 @@
 using TokensGeo;
 using Lexer;
 using ParserGeo;
-public enum Color { black, red, blue, green }
 
 public class Point : token
 {
-    public int x;
-    public int y;
+    public double x;
+    public double y;
 
    token coordenada_x {get ; set ;}
    token coordenada_y {get ; set;}
@@ -14,7 +13,7 @@ public class Point : token
     {
         Random random = new Random(100);
         x = random.Next(0 , 100);
-        Thread.Sleep(100);
+        Thread.Sleep(1000);
         y = random.Next(0 , 100);
     }
     public Point(string Value, TokenTypes Type, token coordenada_x, token coordenada_y) : base(Value, Type )
@@ -60,16 +59,7 @@ public class Line : FuncionPointsDos
         puntosFigura.Add((Point)point1);
         puntosFigura.Add((Point)point2);
     }
-     public List<Point> Puntos_Recta(Point p1, Point p2)
-        {
-            List<Point> result = new List<Point>();
-            for (int x = p1.x; x <= p2.x; x++)
-            {
-                int y = ((p2.y - p1.y) / (p2.x - p1.x)) * (x - p1.x) + p1.y;
-                result.Add(new Point("",TokenTypes.Point , new TokenNumero(x.ToString() , TokenTypes.Number),new TokenNumero( y.ToString() , TokenTypes.Number)));
-            }
-            return result;
-        }
+     
 }
 public class Segment : FuncionPointsDos
 {
@@ -99,9 +89,9 @@ public class Ray : FuncionPointsDos
         {
             List<Point> result = new List<Point>();
             double pendiente_m = (p2.y - p1.y) / (p2.x - p1.x);
-            for (int x = p1.x; x <= p2.x; x++)
+            for (double x = p1.x; x <= p2.x; x++)
             {
-                int y = (int)pendiente_m * (x - p2.x) + p2.y;
+                double y = pendiente_m * (x - p2.x) + p2.y;
                 result.Add(new Point("",TokenTypes.Point ,new TokenNumero(x.ToString(),TokenTypes.Number) , new TokenNumero (y.ToString(), TokenTypes.Number)));
             }
             return result;

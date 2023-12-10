@@ -3,7 +3,7 @@ namespace Lexer
 {
    public class Tokenizar
    {  
-     public static List<token> TokenizeString(string input)
+     public static List<token> TokenizeString(string input , List<Errors> errors)
      {
         List<token> tokens = new List<token>();
         string currentToken = "";
@@ -15,7 +15,11 @@ namespace Lexer
             {
                 continue;
             }
-            if (IsOperator(currentChar.ToString()))
+            if(errores (currentChar))
+            {
+                errors.Add(new Errors(ErrorCode.Lexer , "este caracter  no esta definido en nuestro lenguaje")) ;
+            }
+           else if (IsOperator(currentChar.ToString()))
             {
                     tokens.Add(new OperatorNode(currentChar.ToString(), TokenTypes.Operator));
                     currentToken = "";
@@ -184,7 +188,10 @@ namespace Lexer
      {
         return c == "if"|| c == "else" || c == "let" || c == "in"|| c == "then" ;
      }
-   
+    public  static bool errores (char c )
+    {
+        return c =='@'|| c == '#' || c == '$' || c  == '!'|| c == '?' || c == '~';
+    }
    }
 
     
