@@ -8,14 +8,10 @@ public class Point : token
     public int x;
     public int y;
 
-    token coordenada_x {get ; set ;}
-    token coordenada_y {get ; set ;}
-
-
+   token coordenada_x {get ; set ;}
+   token coordenada_y {get ; set;}
     public Point(string Value, TokenTypes Type ) : base(Value, Type )
     {
-        coordenada_x = null;
-        coordenada_y = null;
         Random random = new Random(100);
         x = random.Next(0 , 100);
         Thread.Sleep(100);
@@ -23,9 +19,10 @@ public class Point : token
     }
     public Point(string Value, TokenTypes Type, token coordenada_x, token coordenada_y) : base(Value, Type )
     {
-        this.coordenada_x = coordenada_x;
-        this.coordenada_y = coordenada_y;
+        this.x = (coordenada_x.Type != TokenTypes.Identifier) ?  int.Parse(coordenada_x.Value) : int.Parse(coordenada_x.tokens[0].Value );
+        this.y =  (coordenada_x.Type != TokenTypes.Identifier) ?  int.Parse(coordenada_y.Value) : int.Parse(coordenada_y.tokens[0].Value );
     }
+   
     public bool CheckSemantic(List<Errors> errores)
     {
         bool coordenadas = true;
@@ -112,6 +109,7 @@ public class Ray : FuncionPointsDos
 }
 public class Measure : FuncionPointsDos
 {
+    int distancia = 0;
     public Measure (string Value , TokenTypes Type) : base (Value , Type){}
 
     public Measure(string Value, TokenTypes Type, token point1, token point2) : base(Value, Type, point1, point2) { }
