@@ -69,7 +69,6 @@
     <Compile Include="Logica\FuncionesGeo.cs" />
     <Compile Include="Logica\GeoType.cs" />
     <Compile Include="Logica\PaitingFig.cs" />
-    <Compile Include="Logica\ConexionPintarLogica.cs" />
     <Compile Include="Logica\TokensGeo.cs" />
     <Compile Include="Logica\TokenizacionGeo.cs" />
     <Compile Include="Logica\ParserGeo.cs" />

@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GeoW));
             this.txtBox_codigo = new System.Windows.Forms.TextBox();
             this.Lienzo = new System.Windows.Forms.PictureBox();
@@ -41,7 +40,6 @@
             this.btn_derecha = new System.Windows.Forms.Button();
             this.btn_izquierda = new System.Windows.Forms.Button();
             this.Error_Box = new System.Windows.Forms.TextBox();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.Lienzo)).BeginInit();
             this.SuspendLayout();
             // 
@@ -179,12 +177,6 @@
             this.Error_Box.Size = new System.Drawing.Size(292, 179);
             this.Error_Box.TabIndex = 11;
             // 
-            // contextMenuStrip1
-            // 
-            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
-            // 
             // GeoW
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -232,6 +224,5 @@
         private System.Windows.Forms.Button btn_derecha;
         private System.Windows.Forms.Button btn_izquierda;
         private System.Windows.Forms.TextBox Error_Box;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
     }
 }
