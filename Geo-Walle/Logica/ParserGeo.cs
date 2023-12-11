@@ -32,18 +32,18 @@ namespace ParserGeo
     //public Stack <Color> colors {get ; set ;}
 
     // constructor del arbol
-        public Geometrico (string Value , TokenTypes Type , Geometrico Root) : base (Value , Type )
-        {
-
-            this.Value = Value;
-            this.Type = Type;
-            variablesLocales = new List<token>();
-            variablesGlobales = new List<token>();
-            this.Root = Root;
-            this.color = new Stack<string>();
-            color.Push("black");
+   public Geometrico (string Value , TokenTypes Type , Geometrico Root) : base (Value , Type )
+   {
+    
+      this.Value = Value ; 
+      this.Type = Type ;
+      variablesLocales = new List<token>();
+      variablesGlobales = new List<token>();
+      this.Root = Root;
+      this.color = new Stack<string>();
+      color.Push("black");
       
-        }
+   }
    // metodo que me chequea la semantica del arbol
    public  bool CheckSemantic(List<Errors> errores)
    {
@@ -552,7 +552,7 @@ namespace ParserGeo
                
                if (expression[position].Value == ")")
                {
-                   parentesis--;
+                    parentesis--;
                     position++;
                     break;
                
@@ -642,6 +642,7 @@ namespace ParserGeo
                     }
                     
                 }
+            }
                 else if (fig.Type == TokenTypes.Arc)
                 {
                     if (fig.tokens.Count == 0)
@@ -656,11 +657,20 @@ namespace ParserGeo
                     }
                     else
                     {
-                        return new Arco (fig.Value , fig.Type , tokens[0] , tokens[1] , tokens[2] , tokens[3] , color.Peek());
+                        try
+                        {
+                            return new Arco (fig.Value , fig.Type , fig.tokens[0] , fig.tokens[1] , fig.tokens[2] , fig.tokens[3] , color.Peek());                            
+                        }
+                        catch (System.Exception)
+                        {
+                            
+                        throw new ArgumentException("los parametros pasados no son validos");
+                        }
+                        
                     }
                     }
                 }
-            }
+            
         
         return fig;
     }
@@ -770,7 +780,7 @@ namespace ParserGeo
     }
     private  bool TiposFigura(string tipoFigura)
     {
-        return tipoFigura == "line" || tipoFigura == "segment" || tipoFigura == "circle" ||tipoFigura =="point"|| tipoFigura == "measure" || tipoFigura == "arc";
+        return tipoFigura == "line" || tipoFigura == "segment" || tipoFigura == "circle" ||tipoFigura =="point"|| tipoFigura == "measure" || tipoFigura == "arc" || tipoFigura == "ray";
     }
     private static bool TipoSecuencia(string TipoSecuencia)
     {

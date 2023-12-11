@@ -67,7 +67,7 @@ namespace Geo_Walle
             try
             {
                 impud = txtBox_codigo.Text;
-                List<token> m = Tokenizar.TokenizeString(impud,errores);
+                List<token> m = Tokenizar.TokenizeString(impud, errores);
                 Geometrico arbol = new Geometrico("", TokenTypes.Identifier, null);
                 arbol.expression = m;
                 arbol.Parser();
@@ -100,40 +100,42 @@ namespace Geo_Walle
             }
             foreach (var item in Figuras_para_dibujar)
             {
-                Paint(item.point1, item.point2, item.figTye, false);
+                Paint(item.point1, item.point2, item.figTye, item.ColorFig, false);
             }
             foreach (var item in Circulos_para_dibujar)
             {
-                PaintCirc(item.point1, item.point2, item.figTye, item.media, false);
+                PaintCirc(item.point1, item.point2, item.figTye, item.ColorFig, item.media, false);
             }
             foreach (var item in Arcos_para_dibujar)
             {
-                PaintArc(item.point1, item.point2, item.point3, item.figTye, item.media, false);
+                PaintArc(item.point1, item.point2, item.point3, item.figTye, item.ColorFig, item.media, false);
             }
         }
 
-        private void PaintCirc(PointP point1, PointP point2, FigTye figura, int media, bool esta)
+        private void PaintCirc(PointP point1, PointP point2, FigTye figura, string color, int media, bool esta)
         {
+            Color FigColor = Color_de_la_Figura(color);
             Graphics lienzo = Lienzo.CreateGraphics();
             if (!esta)
             {
-                Circulos_Dibujados.Add(new Circulo(point1, point2, figura, media));
+                Circulos_Dibujados.Add(new Circulo(point1, point2, figura, color, media));
                 esta = true;
             }
             PaintPoint(point1, esta);
             PaintPoint(point2, esta);
             int radio = media;
 
-            Rectangle circle = new Rectangle(point1.x - radio, point1.y - radio, radio * 2, radio * 2);
-            lienzo.DrawEllipse(new Pen(Color.Black), circle);
+            Rectangle circle = new Rectangle(point1.x - radio + 2, point1.y - radio + 2, radio * 2, radio * 2);
+            lienzo.DrawEllipse(new Pen(FigColor), circle);
         }
 
-        private void Paint(PointP point1, PointP point2, FigTye figura, bool esta)
+        private void Paint(PointP point1, PointP point2, FigTye figura, string color, bool esta)
         {
+            Color FigColor = Color_de_la_Figura(color);
             Graphics lienzo = Lienzo.CreateGraphics();
             if (!esta)
             {
-                Figuras_Dibujadas.Add(new Figuras(point1, point2, figura));
+                Figuras_Dibujadas.Add(new Figuras(point1, point2, figura, color));
                 esta = true;
             }
 
@@ -142,7 +144,7 @@ namespace Geo_Walle
 
             if (figura == FigTye.segment)
             {
-                lienzo.DrawLine(new Pen(Color.Black), point1.x + 2, point1.y + 2, point2.x + 2, point2.y + 2);
+                lienzo.DrawLine(new Pen(FigColor), point1.x + 2, point1.y + 2, point2.x + 2, point2.y + 2);
             }
             else if (figura == FigTye.line)
             {
@@ -152,8 +154,8 @@ namespace Geo_Walle
                 PointP interseccion_Top = new PointP("p1", (int)(point2.x + (0 - point2.y) / pendiente_m), 0);
                 PointP interseccion_Dwn = new PointP("p2", (int)(point2.x + ((this.Height - 1) - point2.y) / pendiente_m), this.Height - 1);
 
-                lienzo.DrawLine(new Pen(Color.Black), interseccion_izq.x + 2, interseccion_izq.y + 2, interseccion_der.x + 2, interseccion_der.y + 2);
-                lienzo.DrawLine(new Pen(Color.Black), interseccion_Top.x + 2, interseccion_Top.y + 2, interseccion_Dwn.x + 2, interseccion_Dwn.y + 2);
+                lienzo.DrawLine(new Pen(FigColor), interseccion_izq.x + 2, interseccion_izq.y + 2, interseccion_der.x + 2, interseccion_der.y + 2);
+                lienzo.DrawLine(new Pen(FigColor), interseccion_Top.x + 2, interseccion_Top.y + 2, interseccion_Dwn.x + 2, interseccion_Dwn.y + 2);
             }
             else if (figura == FigTye.ray)
             {
@@ -169,17 +171,18 @@ namespace Geo_Walle
                 float interseccionY_der = pendiente_m * interseccionX_der + b;
                 PointP interseccion_Der = new PointP("id", (int)interseccionX_der, (int)interseccionY_der);
 
-                lienzo.DrawLine(new Pen(Color.Black), point1.x + 2, point1.y + 2, point2.x + 2, point2.y + 2);
-                //lienzo.DrawLine(new Pen(Color.Black.Brown), interseccion_Izq.x, interseccion_Izq.y, 0, interseccion_Izq.y);
-                lienzo.DrawLine(new Pen(Color.Black), point2.x + 2, point2.y + 2, interseccion_Der.x, interseccion_Der.y);
+                lienzo.DrawLine(new Pen(FigColor), point1.x + 2, point1.y + 2, point2.x + 2, point2.y + 2);
+                //lienzo.DrawLine(new Pen(FigColor.Brown), interseccion_Izq.x, interseccion_Izq.y, 0, interseccion_Izq.y);
+                lienzo.DrawLine(new Pen(FigColor), point2.x + 2, point2.y + 2, interseccion_Der.x, interseccion_Der.y);
             }
         }
-        private void PaintArc(PointP point1, PointP point2, PointP centro, FigTye figura, int media, bool esta)
+        private void PaintArc(PointP centro, PointP point1, PointP point2, FigTye figura, string color, int media, bool esta)
         {
+            Color FigColor = Color_de_la_Figura(color);
             Graphics lienzo = Lienzo.CreateGraphics();
             if (!esta)
             {
-                Arcos_Dibujados.Add(new Arc(point1, point2, centro, figura, media));
+                Arcos_Dibujados.Add(new Arc(centro, point1, point2, figura, color, media));
                 esta = true;
             }
             PaintPoint(point1, esta);
@@ -205,7 +208,48 @@ namespace Geo_Walle
             if (angulo_AB > 0 && angulo_AC < 0) angula_AC_AB = angulo_AB - angulo_AC;
 
             Rectangle arc = new Rectangle(centro.x - radio, centro.y - radio, radio * 2, radio * 2);
-            lienzo.DrawArc(new Pen(Color.Black), arc, angulo_AC, angula_AC_AB);
+            lienzo.DrawArc(new Pen(FigColor), arc, angulo_AB, angula_AC_AB);
+        }
+
+        private Color Color_de_la_Figura(string color)
+        {
+            Color color1 = new Color();
+
+            switch (color)
+            {
+                case "green":
+                    color1 = Color.Green;
+                    break;
+                case "blue":
+                    color1 = Color.Blue;
+                    break;
+                case "red":
+                    color1 = Color.Red;
+                    break;
+                case "yellow":
+                    color1 = Color.Yellow;
+                    break;
+                case "cyan":
+                    color1 = Color.Cyan;
+                    break;
+                case "magenta":
+                    color1 = Color.Magenta;
+                    break;
+                case "white":
+                    color1 = Color.White;
+                    break;
+                case "gray":
+                    color1 = Color.Gray;
+                    break;
+                case "black":
+                    color1 = Color.Black;
+                    break;
+                default:
+                    System.Console.WriteLine("opcion no valida");
+                    break;
+            }
+
+            return color1;
         }
 
         private void PaintPoint(PointP point, bool esta)
@@ -277,17 +321,17 @@ namespace Geo_Walle
             for (int i = 0; i < Figuras_Dibujadas.Count; i++)
             {
                 Figuras_Dibujadas[i].Traslate(x, y);
-                Paint(Figuras_Dibujadas[i].point1, Figuras_Dibujadas[i].point2, Figuras_Dibujadas[i].figTye, true);
+                Paint(Figuras_Dibujadas[i].point1, Figuras_Dibujadas[i].point2, Figuras_Dibujadas[i].figTye, Figuras_Dibujadas[i].ColorFig, true);
             }
             for (int i = 0; i < Arcos_Dibujados.Count; i++)
             {
                 Arcos_Dibujados[i].Traslate(x, y);
-                PaintArc(Arcos_Dibujados[i].point1, Arcos_Dibujados[i].point2, Arcos_Dibujados[i].point3, Arcos_Dibujados[i].figTye, Arcos_Dibujados[i].media, true);
+                PaintArc(Arcos_Dibujados[i].point1, Arcos_Dibujados[i].point2, Arcos_Dibujados[i].point3, Arcos_Dibujados[i].figTye, Arcos_Dibujados[i].ColorFig, Arcos_Dibujados[i].media, true);
             }
             for (int i = 0; i < Circulos_Dibujados.Count; i++)
             {
                 Circulos_Dibujados[i].Traslate(x, y);
-                PaintCirc(Circulos_Dibujados[i].point1, Circulos_Dibujados[i].point2, Circulos_Dibujados[i].figTye, Circulos_Dibujados[i].media, true);
+                PaintCirc(Circulos_Dibujados[i].point1, Circulos_Dibujados[i].point2, Circulos_Dibujados[i].figTye, Circulos_Dibujados[i].ColorFig, Circulos_Dibujados[i].media, true);
             }
             for (int i = 0; i < Points_Dibujados.Count; i++)
             {
@@ -318,53 +362,53 @@ namespace Geo_Walle
                 if (figuras_del_Parser[i].Value == "draw")
                 {
                     List<token> draw = figuras_del_Parser[i].tokens;
-                    for (int j = 0;j< draw.Count; j++)
+                    for (int j = 0; j < draw.Count; j++)
                     {
-                        if (draw[j] is Point)
+                        if (draw[j].Type == TokenTypes.Point)
                         {
-                            PointP p1 = new PointP(draw[j].Value, Convert.ToInt32(((Point)draw[j]).x),Convert.ToInt32(((Point)draw[j]).y));
+                            PointP p1 = new PointP(draw[j].Value, Convert.ToInt32(((Point)draw[j]).x), Convert.ToInt32(((Point)draw[j]).y));
                             Puntos_para_dibujar.Add(p1);
                         }
-                        if (draw[j] is Segment)
+                        if (draw[j].Type == TokenTypes.Segment)
                         {
-                            PointP p1 = new PointP(((Segment)draw[j]).p1.Value, Convert.ToInt32(((Segment)draw[j]).p1.x),Convert.ToInt32(((Segment)draw[j]).p1.y));
-                            PointP p2 = new PointP(((Segment)draw[j]).p2.Value, Convert.ToInt32(((Segment)draw[j]).p2.x),Convert.ToInt32(((Segment)draw[j]).p2.y));
-                            string color = ((Segment)draw[j]).color;
-                            Figuras_para_dibujar.Add(new Figuras(p1, p2, FigTye.segment));
+                            PointP p1 = new PointP(((FuncionPointsDos)draw[j]).p1.Value, Convert.ToInt32(((FuncionPointsDos)draw[j]).p1.x), Convert.ToInt32(((FuncionPointsDos)draw[j]).p1.y));
+                            PointP p2 = new PointP(((FuncionPointsDos)draw[j]).p2.Value, Convert.ToInt32(((FuncionPointsDos)draw[j]).p2.x), Convert.ToInt32(((FuncionPointsDos)draw[j]).p2.y));
+                            string color = ((FuncionPointsDos)draw[j]).color;
+                            Figuras_para_dibujar.Add(new Figuras(p1, p2, FigTye.segment, ((FuncionPointsDos)draw[j]).color));
                         }
-                        if (draw[j] is Line)
+                        if (draw[j].Type == TokenTypes.Line)
                         {
-                            PointP p1 = new PointP(((Line)draw[j]).p1.Value, Convert.ToInt32(((Segment)draw[j]).p1.x),Convert.ToInt32(((Segment)draw[j]).p1.y));
-                            PointP p2 = new PointP(((Line)draw[j]).p2.Value, Convert.ToInt32(((Segment)draw[j]).p2.x),Convert.ToInt32(((Segment)draw[j]).p2.y)); 
-                            string color = ((Line)draw[j]).color;
-                            Figuras_para_dibujar.Add(new Figuras(p1, p2, FigTye.line));
+                            PointP p1 = new PointP(((FuncionPointsDos)draw[j]).p1.Value, Convert.ToInt32(((FuncionPointsDos)draw[j]).p1.x), Convert.ToInt32(((FuncionPointsDos)draw[j]).p1.y));
+                            PointP p2 = new PointP(((FuncionPointsDos)draw[j]).p2.Value, Convert.ToInt32(((FuncionPointsDos)draw[j]).p2.x), Convert.ToInt32(((FuncionPointsDos)draw[j]).p2.y));
+                            string color = ((FuncionPointsDos)draw[j]).color;
+                            Figuras_para_dibujar.Add(new Figuras(p1, p2, FigTye.line, ((FuncionPointsDos)draw[j]).color));
                         }
-                        if (draw[j] is Ray)
+                        if (draw[j].Type == TokenTypes.Ray)
                         {
-                            PointP p1 = new PointP(((Ray)draw[j]).p1.Value, Convert.ToInt32(((Segment)draw[j]).p1.x),Convert.ToInt32(((Segment)draw[j]).p1.y));
-                            PointP p2 = new PointP(((Ray)draw[j]).p2.Value, Convert.ToInt32(((Segment)draw[j]).p2.x),Convert.ToInt32(((Segment)draw[j]).p2.y)); 
-                            string color = ((Ray)draw[j]).color;
-                            Figuras_para_dibujar.Add(new Figuras(p1, p2, FigTye.ray));
+                            PointP p1 = new PointP(((FuncionPointsDos)draw[j]).p1.Value, Convert.ToInt32(((FuncionPointsDos)draw[j]).p1.x), Convert.ToInt32(((FuncionPointsDos)draw[j]).p1.y));
+                            PointP p2 = new PointP(((FuncionPointsDos)draw[j]).p2.Value, Convert.ToInt32(((FuncionPointsDos)draw[j]).p2.x), Convert.ToInt32(((FuncionPointsDos)draw[j]).p2.y));
+                            string color = ((FuncionPointsDos)draw[j]).color;
+                            Figuras_para_dibujar.Add(new Figuras(p1, p2, FigTye.ray, ((FuncionPointsDos)draw[j]).color));
                         }
-                        if (draw[j] is Circunferencia)
+                        if (draw[j].Type == TokenTypes.Circle)
                         {
-                            PointP p1 = new PointP(((Circunferencia)draw[j]).p1.Value, Convert.ToInt32(((Segment)draw[j]).p1.x),Convert.ToInt32(((Segment)draw[j]).p1.y));
-                            PointP p2 = new PointP(((Circunferencia)draw[j]).p2.Value, Convert.ToInt32(((Segment)draw[j]).p2.x),Convert.ToInt32(((Segment)draw[j]).p2.y));
-                            string color = ((Circunferencia)draw[j]).color; 
+                            PointP p1 = new PointP(((Circunferencia)draw[j]).p1.Value, Convert.ToInt32(((Circunferencia)draw[j]).p1.x), Convert.ToInt32(((Circunferencia)draw[j]).p1.y));
+                            PointP p2 = new PointP(((Circunferencia)draw[j]).p2.Value, Convert.ToInt32(((Circunferencia)draw[j]).p2.x), Convert.ToInt32(((Circunferencia)draw[j]).p2.y));
+                            string color = ((Circunferencia)draw[j]).color;
                             int media = ((Circunferencia)draw[j]).medida;
-                            Circulos_para_dibujar.Add(new Circulo(p1, p2, FigTye.circle, media));
+                            Circulos_para_dibujar.Add(new Circulo(p1, p2, FigTye.circle, ((Circunferencia)draw[j]).color, media));
                         }
                         if (draw[j] is Arco)
                         {
-                            PointP p1 = new PointP(((Arco)draw[j]).p1.Value, Convert.ToInt32(((Segment)draw[j]).p1.x),Convert.ToInt32(((Segment)draw[j]).p1.y));
-                            PointP p2 = new PointP(((Arco)draw[j]).p2.Value, Convert.ToInt32(((Segment)draw[j]).p2.x),Convert.ToInt32(((Segment)draw[j]).p2.y));
-                            PointP p3 = new PointP(((Arco)draw[j]).p3.Value, Convert.ToInt32(((Segment)draw[j]).p3.y),Convert.ToInt32(((Segment)draw[j]).p3.y));
+                            PointP p1 = new PointP(((Arco)draw[j]).p1.Value, Convert.ToInt32(((Arco)draw[j]).p1.x), Convert.ToInt32(((Arco)draw[j]).p1.y));
+                            PointP p2 = new PointP(((Arco)draw[j]).p2.Value, Convert.ToInt32(((Arco)draw[j]).p2.x), Convert.ToInt32(((Arco)draw[j]).p2.y));
+                            PointP p3 = new PointP(((Arco)draw[j]).p3.Value, Convert.ToInt32(((Arco)draw[j]).p3.x), Convert.ToInt32(((Arco)draw[j]).p3.y));
                             string color = ((Arco)draw[j]).color;
                             int media = Convert.ToInt32(((Arco)draw[j]).medida);
-                            Arcos_para_dibujar.Add(new Arc(p1, p2, p3, FigTye.circle, media));
+                            Arcos_para_dibujar.Add(new Arc(p1, p2, p3, FigTye.circle, ((FuncionPointsDos)draw[j]).color, media));
                         }
                     }
-                }       
+                }
             }
         }
 

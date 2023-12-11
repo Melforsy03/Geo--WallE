@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Geo_Walle
 {
-    //enum ColorFig { black, green, red, blue }
     public enum FigTye { point, segment, line, ray, circle, arc }
 
     public class Figuras
@@ -15,12 +14,14 @@ namespace Geo_Walle
         public FigTye figTye;
         public PointP point1;
         public PointP point2;
+        public string ColorFig;
 
-        public Figuras(PointP point1, PointP point2, FigTye figType)
+        public Figuras(PointP point1, PointP point2, FigTye figType, string ColorFig)
         {
             this.point1 = point1;
             this.point2 = point2;
             this.figTye = figType;
+            this.ColorFig = ColorFig;
         }
 
         public void Traslate(int eje_x, int eje_y)
@@ -35,7 +36,7 @@ namespace Geo_Walle
     {
         public int media;
 
-        public Circulo(PointP point1, PointP point2, FigTye figType, int media) : base(point1, point2, figType)
+        public Circulo(PointP point1, PointP point2, FigTye figType, string ColorFig, int media) : base(point1, point2, figType, ColorFig)
         {
             this.media = media;
         }
@@ -44,7 +45,7 @@ namespace Geo_Walle
     {
         public PointP point3;
 
-        public Arc(PointP point1, PointP point2, PointP point3, FigTye figType, int media) : base(point1, point2, figType, media)
+        public Arc(PointP point1, PointP point2, PointP point3, FigTye figType, string ColorFig, int media) : base(point1, point2, figType, ColorFig, media)
         {
             this.point3 = point3;
         }
@@ -63,7 +64,8 @@ namespace Geo_Walle
         public int x;
         public int y;
         public string name;
-        
+        public string ColorFig;
+
         public PointP(string name, int x, int y)
         {
             this.name = name;

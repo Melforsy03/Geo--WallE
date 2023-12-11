@@ -188,7 +188,6 @@ namespace TokensGeo
   }
   public class FuncionPointsDos : Figura
   {
-
     public List<Point> puntosFigura { get; set; }
 
     public GeoType GeoType;
