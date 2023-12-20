@@ -52,15 +52,11 @@
     <Compile Include="ArcBase.cs" />
     <Compile Include="ArcBase1.cs" />
     <Compile Include="Fig.cs" />
-    <Compile Include="GeoW.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="GeoW.cs" />
     <Compile Include="GeoW.Designer.cs">
       <DependentUpon>GeoW.cs</DependentUpon>
     </Compile>
-    <Compile Include="Inicio.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Inicio.cs" />
     <Compile Include="Inicio.Designer.cs">
       <DependentUpon>Inicio.cs</DependentUpon>
     </Compile>

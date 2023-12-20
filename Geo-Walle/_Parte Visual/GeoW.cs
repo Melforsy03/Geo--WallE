@@ -122,7 +122,7 @@ namespace Geo_Walle
                 esta = true;
             }
             PaintPoint(point1, esta);
-            PaintPoint(point2, esta);
+            //PaintPoint(point2, esta);
             int radio = media;
 
             Rectangle circle = new Rectangle(point1.x - radio + 2, point1.y - radio + 2, radio * 2, radio * 2);
@@ -208,7 +208,7 @@ namespace Geo_Walle
             if (angulo_AB > 0 && angulo_AC < 0) angula_AC_AB = angulo_AB - angulo_AC;
 
             Rectangle arc = new Rectangle(centro.x - radio, centro.y - radio, radio * 2, radio * 2);
-            lienzo.DrawArc(new Pen(FigColor), arc, angulo_AB, angula_AC_AB);
+            lienzo.DrawArc(new Pen(FigColor), arc, angulo_AC, angula_AC_AB);
         }
 
         private Color Color_de_la_Figura(string color)
@@ -275,7 +275,7 @@ namespace Geo_Walle
             if (pendiente_m < 0)
             {
                 if (centro.y > point2.y) alpha = angulo_grados;
-                if (centro.y < point2.y) alpha = 180 - angulo_grados;
+                if (centro.y < point2.y) alpha = 180 + angulo_grados;
             }
 
             return alpha;
