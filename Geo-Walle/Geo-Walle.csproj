@@ -36,8 +36,11 @@
     <ApplicationIcon>Word.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,33 +50,50 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArcBase.cs" />
-    <Compile Include="ArcBase1.cs" />
-    <Compile Include="Fig.cs" />
-    <Compile Include="GeoW.cs" />
-    <Compile Include="GeoW.Designer.cs">
+    <Compile Include="_Parte Logica\Contexto.cs" />
+    <Compile Include="_Parte Logica\Expresiones\AtomExp.cs" />
+    <Compile Include="_Parte Logica\Expresiones\BinaryExp.cs" />
+    <Compile Include="_Parte Logica\Expresiones\Binary\Aritmetica.cs" />
+    <Compile Include="_Parte Logica\Expresiones\Binary\Buleana.cs" />
+    <Compile Include="_Parte Logica\Expresiones\Fig\Figuras.cs" />
+    <Compile Include="_Parte Logica\Expresiones\Fig\Fig_con_Parametros.cs" />
+    <Compile Include="_Parte Logica\Expresiones\Fig\Fig_sin_Parametros.cs" />
+    <Compile Include="_Parte Logica\Expresiones\Functions.cs" />
+    <Compile Include="_Parte Logica\Expresiones\Secuencias\RamdomsBase.cs" />
+    <Compile Include="_Parte Logica\Expresiones\Secuencias\Secuencia.cs" />
+    <Compile Include="_Parte Logica\Expresiones\Secuencias\Secuencias_con_Parametros.cs" />
+    <Compile Include="_Parte Logica\Expresiones\Secuencias\Secuencias_sin_Parametros.cs" />
+    <Compile Include="_Parte Logica\Expresiones\_Expresiones.cs" />
+    <Compile Include="_Parte Logica\Expresiones\TernaryExp.cs" />
+    <Compile Include="_Parte Logica\Expresiones\UnaryExp.cs" />
+    <Compile Include="_Parte Logica\Parser\Arbol.cs" />
+    <Compile Include="_Parte Logica\Scope.cs" />
+    <Compile Include="_Parte Visual\Fig.cs" />
+    <Compile Include="_Parte Visual\GeoW.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="_Parte Visual\GeoW.Designer.cs">
       <DependentUpon>GeoW.cs</DependentUpon>
     </Compile>
-    <Compile Include="Inicio.cs" />
-    <Compile Include="Inicio.Designer.cs">
+    <Compile Include="_Parte Visual\Inicio.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="_Parte Visual\Inicio.Designer.cs">
       <DependentUpon>Inicio.cs</DependentUpon>
     </Compile>
-    <Compile Include="Logica\Interseccion.cs" />
-    <Compile Include="Logica\Error.cs" />
-    <Compile Include="Logica\FuncionesGeo.cs" />
-    <Compile Include="Logica\GeoType.cs" />
-    <Compile Include="Logica\PaitingFig.cs" />
-    <Compile Include="Logica\TokensGeo.cs" />
-    <Compile Include="Logica\TokenizacionGeo.cs" />
-    <Compile Include="Logica\ParserGeo.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="_Parte Logica\Error.cs" />
+    <Compile Include="_Parte Logica\Tokenizador\Token.cs" />
+    <Compile Include="_Parte Logica\Tokenizador\Tokenizador.cs" />
+    <Compile Include="_Parte Visual\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="GeoW.resx">
+    <Compile Include="_Parte Visual\Walle.cs" />
+    <EmbeddedResource Include="_Parte Visual\GeoW.resx">
       <DependentUpon>GeoW.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Inicio.resx">
+    <EmbeddedResource Include="_Parte Visual\Inicio.resx">
       <DependentUpon>Inicio.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -120,5 +140,6 @@
     <None Include="Resources\photo_2023-12-04_12-31-06.jpg" />
     <Content Include="Word.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

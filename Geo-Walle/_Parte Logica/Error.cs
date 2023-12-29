@@ -1,8 +1,6 @@
-﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
+using System.Threading;
 
 namespace Lexer
 {
@@ -11,8 +9,6 @@ namespace Lexer
         public ErrorCode Code { get; private set; }
 
         public string Argument { get; private set; }
-
-        //public CodeLocation Location { get; private set; }
 
         public Errors(ErrorCode code, string argument)
         {

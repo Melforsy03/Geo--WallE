@@ -49,16 +49,15 @@
             this.txtBox_codigo.Location = new System.Drawing.Point(73, 75);
             this.txtBox_codigo.Multiline = true;
             this.txtBox_codigo.Name = "txtBox_codigo";
-            this.txtBox_codigo.Size = new System.Drawing.Size(292, 562);
+            this.txtBox_codigo.Size = new System.Drawing.Size(350, 582);
             this.txtBox_codigo.TabIndex = 0;
-            this.txtBox_codigo.TextChanged += new System.EventHandler(this.txtBox_codigo_TextChanged);
             // 
             // Lienzo
             // 
             this.Lienzo.BackColor = System.Drawing.Color.Gray;
-            this.Lienzo.Location = new System.Drawing.Point(575, 75);
+            this.Lienzo.Location = new System.Drawing.Point(540, 75);
             this.Lienzo.Name = "Lienzo";
-            this.Lienzo.Size = new System.Drawing.Size(1138, 562);
+            this.Lienzo.Size = new System.Drawing.Size(1173, 582);
             this.Lienzo.TabIndex = 1;
             this.Lienzo.TabStop = false;
             // 
@@ -100,7 +99,7 @@
             this.btn_run.TabIndex = 4;
             this.btn_run.Text = "Dotnet Run";
             this.btn_run.UseVisualStyleBackColor = false;
-            this.btn_run.Click += new System.EventHandler(this.btn_run_Click);
+            this.btn_run.Click += new System.EventHandler(this.btn_run_Click_1);
             // 
             // btn_reset
             // 
@@ -174,7 +173,7 @@
             this.Error_Box.Location = new System.Drawing.Point(73, 663);
             this.Error_Box.Multiline = true;
             this.Error_Box.Name = "Error_Box";
-            this.Error_Box.Size = new System.Drawing.Size(292, 179);
+            this.Error_Box.Size = new System.Drawing.Size(350, 179);
             this.Error_Box.TabIndex = 11;
             // 
             // GeoW
@@ -204,7 +203,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Geo_WallE";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.Load += new System.EventHandler(this.GeoW_Load);
             ((System.ComponentModel.ISupportInitialize)(this.Lienzo)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
